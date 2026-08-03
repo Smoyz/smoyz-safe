@@ -56,7 +56,7 @@ svg{width:22px;height:22px;flex:none}
 .screen{flex:1;display:none;flex-direction:column}
 .screen.on{display:flex}
 
-/* ---- gate screens (setup / lock) ---- */
+/* ---- gate screens ---- */
 .gate{align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:0}
 .gate-mark{
   width:88px;height:88px;border-radius:50%;
@@ -65,24 +65,25 @@ svg{width:22px;height:22px;flex:none}
   display:flex;align-items:center;justify-content:center;margin-bottom:20px;
 }
 .gate-mark svg{width:40px;height:40px;color:var(--flame)}
-.gate h1{font-size:1.75rem;font-weight:800;letter-spacing:-.01em}
+.gate h1{font-size:1.75rem;font-weight:800;letter-spacing:-.01em;direction:ltr}
 .gate .brand{
   font-size:.66rem;font-weight:600;letter-spacing:.34em;color:var(--faint);
   margin-top:6px;margin-bottom:30px;direction:ltr;
 }
-.gate form{width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;text-align:right}
+.gate form{width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;text-align:start}
 .gate label{font-size:.85rem;color:var(--muted)}
 .field{position:relative}
-.field input{padding-inline-end:46px}
+/* العين دايمًا على اليمين — عشان بداية الباسورد (من الشمال) متتغطاش */
+.field input{padding-right:46px}
 .field .peek{
-  position:absolute;top:0;inset-inline-end:0;height:100%;width:46px;
+  position:absolute;top:0;right:0;left:auto;height:100%;width:46px;
   display:flex;align-items:center;justify-content:center;color:var(--faint);
 }
 .field .peek:active{color:var(--ink)}
 .btn{
   border-radius:var(--r-md);padding:13px 18px;font-weight:700;font-size:1rem;
   display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:filter .15s, transform .1s;
+  transition:filter .15s, transform .1s, background .15s;
 }
 .btn:active{transform:scale(.985)}
 .btn-flame{background:var(--flame);color:var(--on-flame)}
@@ -91,17 +92,17 @@ svg{width:22px;height:22px;flex:none}
 .btn-ghost{background:var(--surface-2);border:1px solid var(--line)}
 .btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
 .warn-box{
-  display:flex;gap:10px;align-items:flex-start;text-align:right;
+  display:flex;gap:10px;align-items:flex-start;text-align:start;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
   padding:12px 14px;font-size:.85rem;color:var(--muted);line-height:1.65;
 }
 .warn-box svg{color:var(--amber);width:19px;height:19px;margin-top:2px}
 .gate .aux{margin-top:22px;font-size:.85rem;color:var(--cyan);text-decoration:underline;text-underline-offset:3px}
+.gate .lang-sw{margin-top:12px;font-size:.8rem;color:var(--faint)}
 .gate-err{color:var(--danger);font-size:.85rem;min-height:1.2em}
 .shake{animation:shake .4s}
 @keyframes shake{20%,60%{transform:translateX(6px)}40%,80%{transform:translateX(-6px)}}
 
-/* strength meter */
 .meter{height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden}
 .meter i{display:block;height:100%;width:0;border-radius:2px;background:var(--danger);transition:width .25s,background .25s}
 .meter-lbl{font-size:.75rem;color:var(--faint);min-height:1em}
@@ -118,14 +119,13 @@ header.bar{
   display:flex;align-items:center;justify-content:center}
 .bar-mark svg{width:19px;height:19px}
 .bar-t{flex:1;line-height:1.15}
-.bar-t b{font-size:1.06rem;font-weight:800;display:block}
-.bar-t span{font-size:.6rem;letter-spacing:.3em;color:var(--faint);direction:ltr;display:block}
+.bar-t b{font-size:1.06rem;font-weight:800;display:block;direction:ltr;text-align:start}
+.bar-t span{font-size:.6rem;letter-spacing:.3em;color:var(--faint);direction:ltr;display:block;text-align:start}
 .bar-lock{width:42px;height:42px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--ink);background:rgba(255,255,255,.07)}
 .bar-lock:active{background:rgba(255,255,255,.14)}
 
 main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap:10px}
 
-/* rows */
 .row{
   display:flex;align-items:center;gap:12px;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
@@ -137,6 +137,7 @@ main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap
   display:flex;align-items:center;justify-content:center;color:var(--flame);flex:none;
 }
 .row-ic.cy{color:var(--cyan)}
+.row-ic.vi{color:var(--violet)}
 .row-ic svg{width:19px;height:19px}
 .row-main{flex:1;min-width:0}
 .row-t{font-weight:700;font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -149,7 +150,6 @@ main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap
 .icon-btn:active{background:var(--surface-2);color:var(--ink)}
 .icon-btn svg{width:19px;height:19px}
 
-/* chips */
 .chip{
   display:inline-flex;align-items:center;padding:3px 9px;border-radius:var(--r-sm);
   font-size:.7rem;font-weight:700;background:var(--panel);border:1px solid var(--border-strong);color:var(--ink);
@@ -157,12 +157,11 @@ main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap
 }
 .chip.meeza{letter-spacing:0}
 
-/* search */
 .search{position:relative}
 .search svg{position:absolute;inset-inline-start:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--faint);pointer-events:none}
 .search input{padding-inline-start:44px;border-radius:var(--r-lg);background:var(--surface)}
 
-/* money summary */
+/* money */
 .mny-sum{
   display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;justify-content:space-between;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
@@ -177,15 +176,27 @@ main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap
 .row.settled .row-t{text-decoration:line-through}
 .settle-btn{border:1.5px solid var(--line);color:var(--faint)}
 .settle-btn.done{border-color:var(--ok);color:var(--ok);background:rgba(69,217,91,.10)}
+.sec-h{
+  font-size:.78rem;font-weight:700;color:var(--faint);letter-spacing:.02em;
+  margin:8px 4px -2px;display:flex;align-items:center;gap:7px;
+}
+.sec-h svg{width:15px;height:15px}
+.pay-banner{
+  display:flex;gap:10px;align-items:center;
+  background:rgba(242,169,59,.10);border:1px solid rgba(242,169,59,.4);border-radius:var(--r-lg);
+  padding:11px 14px;font-size:.86rem;color:var(--amber);font-weight:600;line-height:1.5;
+}
+.pay-banner svg{width:19px;height:19px;flex:none}
+.prog{height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden;margin-top:7px}
+.prog i{display:block;height:100%;background:var(--cyan);border-radius:2px}
+.turn-note{color:var(--ok);font-weight:700}
 
-/* empty state */
 .empty{
   text-align:center;color:var(--faint);padding:56px 24px;display:flex;flex-direction:column;
   align-items:center;gap:12px;font-size:.92rem;line-height:1.7;
 }
 .empty svg{width:42px;height:42px;opacity:.4}
 
-/* bottom nav */
 nav#tabs{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:480px;z-index:var(--z-nav);
@@ -200,7 +211,6 @@ nav#tabs button svg{width:21px;height:21px}
 nav#tabs button.on{color:var(--flame)}
 nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);width:7px;height:7px;border-radius:50%;background:var(--amber)}
 
-/* FAB */
 #fab{
   position:fixed;bottom:calc(74px + env(safe-area-inset-bottom));z-index:var(--z-fab);
   inset-inline-end:calc(50% - 240px + 18px);
@@ -214,10 +224,9 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 #fab svg{width:25px;height:25px}
 #fab.hide{display:none}
 
-/* settings */
 .set-group{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
 .set-item{
-  display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;text-align:right;
+  display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;text-align:start;
   border-bottom:1px solid var(--line);
 }
 .set-item:last-child{border-bottom:none}
@@ -231,7 +240,6 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 .sec-note{font-size:.8rem;color:var(--faint);line-height:1.8;padding:4px 6px}
 .sec-note b{color:var(--muted)}
 
-/* ---- bottom sheet ---- */
 #sheet-bk{
   position:fixed;inset:0;background:rgba(5,7,8,.66);z-index:var(--z-sheet-bk);
   opacity:0;pointer-events:none;transition:opacity .22s;
@@ -246,9 +254,7 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
   transition:transform .28s cubic-bezier(.16,1,.3,1);
 }
 #sheet.on{transform:translate(-50%,0)}
-.sheet-h{
-  display:flex;align-items:center;gap:8px;padding:16px 18px 8px;
-}
+.sheet-h{display:flex;align-items:center;gap:8px;padding:16px 18px 8px}
 .sheet-h b{flex:1;font-size:1.06rem;font-weight:800}
 .sheet-body{overflow-y:auto;padding:8px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
 .sheet-body label{font-size:.83rem;color:var(--muted);margin-bottom:-6px}
@@ -258,6 +264,15 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 .seg button{flex:1;padding:9px;border-radius:9px;font-weight:700;font-size:.92rem;color:var(--muted)}
 .seg button.on-pos{background:rgba(69,217,91,.14);color:var(--ok)}
 .seg button.on-neg{background:rgba(242,169,59,.14);color:var(--amber)}
+.type-pick{display:flex;flex-direction:column;gap:10px}
+.type-pick button{
+  display:flex;align-items:center;gap:12px;text-align:start;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 16px;
+}
+.type-pick button:active{border-color:var(--flame)}
+.type-pick .row-ic{width:38px;height:38px}
+.type-pick b{display:block;font-size:.95rem}
+.type-pick small{color:var(--faint);font-size:.78rem}
 details.gen{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
 details.gen summary{
   list-style:none;cursor:pointer;padding:11px 14px;font-size:.88rem;font-weight:700;color:var(--muted);
@@ -278,7 +293,6 @@ details.gen summary svg{width:17px;height:17px}
 .reveal-line .val{flex:1;font-size:.95rem;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
 .reveal-line .lbl{font-size:.75rem;color:var(--faint);flex:none}
 
-/* ---- confirm dialog ---- */
 #cf-bk{position:fixed;inset:0;background:rgba(5,7,8,.72);z-index:var(--z-confirm-bk);display:none;align-items:center;justify-content:center;padding:26px}
 #cf-bk.on{display:flex}
 #cf{
@@ -290,7 +304,6 @@ details.gen summary svg{width:17px;height:17px}
 #cf .cf-btns{display:flex;gap:10px;margin-top:4px}
 #cf .cf-btns .btn{flex:1;padding:11px;font-size:.92rem}
 
-/* ---- toast ---- */
 #toast{
   position:fixed;bottom:calc(84px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,16px);
   background:var(--panel);border:1px solid var(--border-strong);color:var(--ink);
@@ -300,7 +313,6 @@ details.gen summary svg{width:17px;height:17px}
 }
 #toast.on{opacity:1;transform:translate(-50%,0)}
 
-/* entrance */
 .fade-in{animation:fadeIn .26s ease-out}
 @keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 .spin{animation:spin 1s linear infinite}
@@ -313,79 +325,77 @@ details.gen summary svg{width:17px;height:17px}
 
 <div id="app">
 
-  <!-- شاشة الإنشاء الأولى -->
+  <!-- إنشاء أول مرة -->
   <section class="screen gate" id="scr-setup">
     <div class="gate-mark" id="setup-mark"></div>
     <h1>Smoyz Safe</h1>
     <div class="brand">LET&nbsp;THE&nbsp;GAME&nbsp;BEGIN</div>
     <form id="setup-form" autocomplete="off">
-      <label for="su-pw">اعمل كلمة سر رئيسية — دي مفتاح كل حاجة</label>
+      <label for="su-pw" data-i18n="suLabel"></label>
       <div class="field">
-        <input type="password" id="su-pw" class="ltr" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="كلمة سر قوية (12+ حرف)">
-        <button type="button" class="peek" data-peek="su-pw" aria-label="إظهار كلمة السر"></button>
+        <input type="password" id="su-pw" class="ltr" autocomplete="new-password" autocapitalize="off" spellcheck="false">
+        <button type="button" class="peek" data-peek="su-pw" aria-label="show"></button>
       </div>
       <div class="meter"><i id="su-meter"></i></div>
       <div class="meter-lbl" id="su-meter-lbl"></div>
       <div class="field">
-        <input type="password" id="su-pw2" class="ltr" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="اكتبها تاني للتأكيد">
-        <button type="button" class="peek" data-peek="su-pw2" aria-label="إظهار كلمة السر"></button>
+        <input type="password" id="su-pw2" class="ltr" autocomplete="new-password" autocapitalize="off" spellcheck="false">
+        <button type="button" class="peek" data-peek="su-pw2" aria-label="show"></button>
       </div>
-      <div class="warn-box" id="su-warn">
-        <span id="su-warn-ic"></span>
-        <span>لو نسيت كلمة السر دي <b>مفيش أي طريقة</b> لاسترجاع بياناتك — كل حاجة متشفّرة بيها وما بتتخزنش في أي مكان. احفظها كويس.</span>
-      </div>
+      <div class="warn-box"><span id="su-warn-ic"></span><span data-i18n="suWarn"></span></div>
       <div class="gate-err" id="su-err"></div>
-      <button type="submit" class="btn btn-flame" id="su-btn">أنشئ الخزنة</button>
+      <button type="submit" class="btn btn-flame" id="su-btn" data-i18n="suBtn"></button>
     </form>
-    <button class="aux" id="su-restore">عندك نسخة احتياطية؟ استرجعها</button>
+    <button class="aux" id="su-restore" data-i18n="suRestore"></button>
+    <button class="lang-sw" id="lang-sw-setup"></button>
   </section>
 
-  <!-- شاشة القفل -->
+  <!-- القفل -->
   <section class="screen gate" id="scr-lock">
     <div class="gate-mark" id="lock-mark"></div>
     <h1>Smoyz Safe</h1>
-    <div class="brand">مقفول&nbsp;🔒</div>
+    <div class="brand" id="lock-brand"></div>
     <form id="lock-form" autocomplete="off">
       <div class="field">
-        <input type="password" id="lk-pw" class="ltr" autocomplete="current-password" autocapitalize="off" spellcheck="false" placeholder="كلمة السر الرئيسية">
-        <button type="button" class="peek" data-peek="lk-pw" aria-label="إظهار كلمة السر"></button>
+        <input type="password" id="lk-pw" class="ltr" autocomplete="current-password" autocapitalize="off" spellcheck="false">
+        <button type="button" class="peek" data-peek="lk-pw" aria-label="show"></button>
       </div>
       <div class="gate-err" id="lk-err"></div>
-      <button type="submit" class="btn btn-flame" id="lk-btn">افتح الخزنة</button>
+      <button type="submit" class="btn btn-flame" id="lk-btn" data-i18n="lkBtn"></button>
+      <button type="button" class="btn btn-ghost" id="lk-bio" style="display:none"></button>
     </form>
-    <button class="aux" id="lk-forgot">نسيت كلمة السر؟</button>
+    <button class="aux" id="lk-forgot" data-i18n="lkForgot"></button>
+    <button class="lang-sw" id="lang-sw-lock"></button>
   </section>
 
-  <!-- الشاشة الرئيسية -->
+  <!-- الرئيسية -->
   <section class="screen" id="scr-main">
     <header class="bar">
       <div class="bar-mark" id="bar-mark"></div>
       <div class="bar-t"><b>Smoyz Safe</b><span>SECURE&nbsp;VAULT</span></div>
-      <button class="bar-lock" id="btn-lock" aria-label="اقفل الخزنة دلوقتي"></button>
+      <button class="bar-lock" id="btn-lock" aria-label="lock"></button>
     </header>
     <main id="content"></main>
-    <button id="fab" aria-label="إضافة جديد"></button>
+    <button id="fab" aria-label="add"></button>
     <nav id="tabs"></nav>
   </section>
 
 </div>
 
-<!-- Bottom sheet -->
 <div id="sheet-bk"></div>
 <div id="sheet" role="dialog" aria-modal="true">
-  <div class="sheet-h"><b id="sheet-title"></b><button class="icon-btn" id="sheet-x" aria-label="إغلاق"></button></div>
+  <div class="sheet-h"><b id="sheet-title"></b><button class="icon-btn" id="sheet-x" aria-label="close"></button></div>
   <div class="sheet-body" id="sheet-body"></div>
 </div>
 
-<!-- Confirm -->
 <div id="cf-bk">
   <div id="cf">
     <b id="cf-title"></b>
     <p id="cf-msg"></p>
     <input type="text" id="cf-input" style="display:none" autocomplete="off">
     <div class="cf-btns">
-      <button class="btn btn-ghost" id="cf-no">إلغاء</button>
-      <button class="btn" id="cf-yes">تأكيد</button>
+      <button class="btn btn-ghost" id="cf-no"></button>
+      <button class="btn" id="cf-yes"></button>
     </div>
   </div>
 </div>
@@ -395,9 +405,22 @@ details.gen summary svg{width:17px;height:17px}
 
 <script>
 'use strict';
-/* ================= أساسيات ================= */
-document.documentElement.setAttribute('dir','rtl');
-document.documentElement.setAttribute('lang','ar-EG');
+/* ================= إعدادات عامة ================= */
+const APP_VERSION='1.7'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=8;       // بيتبمب تلقائيًا من release.ps1
+const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
+const LS_KEY='smoyz.safe.v1';
+const LS_GUARD='smoyz.safe.guard';
+const LS_LANG='smoyz.safe.lang';
+/* ترحيل بيانات النسخ القديمة (قبل تغيير الاسم) */
+try{
+  const _old='vancore.khazna.v1', _oldG='vancore.khazna.guard';
+  if(!localStorage.getItem(LS_KEY)&&localStorage.getItem(_old)){
+    localStorage.setItem(LS_KEY,localStorage.getItem(_old));
+    localStorage.removeItem(_old);localStorage.removeItem(_oldG);
+  }
+}catch(e){}
+
 if(!document.querySelector('meta[name=viewport]')){
   const m=document.createElement('meta');m.name='viewport';
   m.content='width=device-width, initial-scale=1, viewport-fit=cover';
@@ -408,7 +431,214 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=> (crypto.randomUUID? crypto.randomUUID() : 'id-'+Date.now()+'-'+Math.floor(Math.random()*1e9));
 
-/* أيقونات SVG */
+/* ================= اللغات ================= */
+const L={
+ar:{
+  suLabel:'اعمل كلمة سر رئيسية — دي مفتاح كل حاجة',
+  suPh:'كلمة سر قوية (12+ حرف)', suPh2:'اكتبها تاني للتأكيد',
+  suWarn:'لو نسيت كلمة السر دي مفيش أي طريقة لاسترجاع بياناتك — كل حاجة متشفّرة بيها وما بتتخزنش في أي مكان. فعّل البصمة بعدين كخط نجاة، واحفظها كويس.',
+  suBtn:'أنشئ الخزنة', suRestore:'عندك نسخة احتياطية؟ استرجعها',
+  suShort:'كلمة السر لازم تكون 8 أحرف على الأقل', suMismatch:'الكلمتين مش زي بعض',
+  suMaking:'بجهّز الخزنة...', suDone:'اتعملت الخزنة ✓ محدش يقدر يفتحها غيرك',
+  lockBrand:'مقفول 🔒', lkPh:'كلمة السر الرئيسية', lkBtn:'افتح الخزنة', lkOpening:'بفتح...',
+  lkWrong:'كلمة السر مش صح', lkDelay:' — في تأخير بسبب المحاولات المتكررة', lkWait:'استنى {n} ثانية...',
+  lkForgot:'نسيت كلمة السر؟', lkBio:'افتح بالبصمة 👆',
+  forgotT:'نسيت كلمة السر؟',
+  forgotMsg:'مفيش أي طريقة لاسترجاعها — دي أساس الأمان. لو مفعّل البصمة افتح بيها وغيّر كلمة السر من الإعدادات. غير كده الحل الوحيد مسح الخزنة والبدء من جديد (أو استرجاع نسخة احتياطية فاكر كلمة سرها). للمسح النهائي اكتب "امسح" تحت.',
+  eraseWord:'امسح', eraseAllBtn:'امسح كل حاجة',
+  locked:'اتقفلت ✓', lockedAuto:'اتقفلت تلقائيًا 🔒',
+  tabPw:'الباسوردات', tabCards:'الكروت', tabMoney:'الفلوس', tabSet:'الإعدادات',
+  searchPh:'دوّر على خدمة أو إيميل...',
+  pwEmptyQ:'مفيش نتايج للبحث ده', pwEmpty:'لسه مفيش باسوردات محفوظة.<br>دوس <b>+</b> وابدأ ضيف أول واحد',
+  cardsEmpty:'لسه مفيش كروت محفوظة.<br>دوس <b>+</b> وضيف أول كارت — كله متشفّر على جهازك',
+  moneyEmpty:'لسه مفيش حاجة متسجلة.<br>دوس <b>+</b> وسجّل دين أو قسط أو جمعية',
+  copyUser:'انسخ الإيميل', copyPass:'انسخ الباسورد', copyNum:'انسخ رقم الكارت',
+  copiedMail:'الإيميل اتنسخ', copiedPass:'الباسورد اتنسخ', copiedNum:'رقم الكارت اتنسخ',
+  copied:'اتنسخ', copyClip:' ✓ — هيتمسح من الكليبورد بعد ٤٠ ثانية', copyBlocked:'النسخ اتمنع من المتصفح',
+  saved:'اتحفظ ✓', deleted:'اتمسح', cancel:'إلغاء', confirm:'تأكيد', save:'احفظ', saveEdit:'احفظ التعديل',
+  pwNew:'باسورد جديد', pwEdit:'تعديل باسورد',
+  fService:'الخدمة', fServicePh:'جوجل، فيسبوك، انستجرام...', fEmail:'الإيميل / اسم المستخدم',
+  fPass:'الباسورد', fUrl:'اللينك (اختياري)', fNotes:'ملاحظات (اختياري)',
+  needService:'اكتب اسم الخدمة الأول', needPass:'اكتب الباسورد',
+  genTitle:'ولّدلي باسورد قوي', genLen:'الطول', genUpper:'حروف كبيرة A-Z', genDigits:'أرقام 0-9', genSym:'رموز !@#$', genGo:'توليد',
+  strength:'القوة: ', sWeak:'ضعيفة', sMid:'متوسطة', sStrong:'قوية', sPerfect:'ممتازة 💪',
+  delPwT:'مسح "{x}"؟', delMsg:'مش هتقدر ترجّعه تاني.', delBtn:'امسح',
+  delPwBtn:'امسح الباسورد ده', delCardBtn:'امسح الكارت ده', delItemBtn:'امسح ده نهائيًا',
+  cardNew:'كارت جديد', cardEdit:'تعديل كارت',
+  cName:'اسم الكارت', cNamePh:'فيزا CIB، ماستر البنك الأهلي...', cNum:'رقم الكارت',
+  cExp:'تاريخ الانتهاء', cCvv:'CVV', cHolder:'اسم صاحب الكارت', cNotes:'ملاحظات (اختياري — PIN مثلًا)',
+  cFull:'الرقم كامل', needCName:'اكتب اسم الكارت الأول', needCNum:'رقم الكارت مش مكتمل',
+  cardWord:'كارت',
+  pickType:'عايز تضيف إيه؟',
+  typeDebt:'دين / سلفة', typeDebtS:'فلوس ليك أو عليك مع حد',
+  typeInst:'قسط', typeInstS:'قسط شهري لجهة تمويل (بنك، valU، متجر...)',
+  typeGam:'جمعية', typeGamS:'جمعية شهرية وميعاد قبضك',
+  debtNew:'دين جديد', debtEdit:'تعديل دين',
+  mFor:'ليّا (يرجعلي) 💰', mOn:'عليّا (أرجّعه)', mWho:'مين؟', mWhoPh:'اسم الشخص أو الجهة',
+  mAmount:'المبلغ', mCur:'العملة', mDate:'التاريخ', mNote:'ملاحظة (اختياري)', mNotePh:'سلفة، حساب شغل...',
+  needWho:'اكتب الاسم الأول', needAmount:'اكتب المبلغ',
+  forYou:'ليك', youOwe:'عليك',
+  settledDone:'اتسوّت ✓', settledBack:'رجع مفتوح',
+  instNew:'قسط جديد', instEdit:'تعديل قسط',
+  iTitle:'القسط ده بتاع إيه؟', iTitlePh:'موبايل، تلاجة، عربية...',
+  iFunder:'جهة التمويل', iFunderPh:'بنك، valU، سوق.كوم...',
+  iMonthly:'القسط الشهري', iDueDay:'يوم الاستحقاق (1-31)', iMonths:'عدد الشهور', iPaid:'شهور مدفوعة',
+  needITitle:'اكتب الاسم الأول', needIFunder:'اكتب جهة التمويل', needMonthly:'اكتب القسط الشهري', needMonths:'اكتب عدد الشهور',
+  gamNew:'جمعية جديدة', gamEdit:'تعديل جمعية',
+  gTitle:'اسم الجمعية', gTitlePh:'جمعية الشغل، جمعية العيلة...',
+  gMonthly:'القسط الشهري', gTurn:'دورك في الشهر رقم',
+  perMonth:'/شهر', dueDayS:'يوم {n}', monthsProg:'{a}/{b} شهر',
+  payThis:'دفع الشهر ده', turnNow:'استلامك الشهر ده 🎉', instDone:'مبروك! القسط خلص 🎉', gamDone:'مبروك! الجمعية خلصت 🎉',
+  secDebts:'الديون', secInst:'الأقساط', secGam:'الجمعيات',
+  payBanner:'فاضل {n} مستحقات الشهر ده — متنساش تدفعهم',
+  setLang:'اللغة / Language', setLangS:'بتطبق فورًا على كل التطبيق',
+  setLock:'القفل التلقائي', setLockS:'يقفل لوحده بعد فترة خمول', mins:'دقايق',
+  setBio:'الدخول بالبصمة', setBioOn:'مفعّلة — بتفتح بيها وتقدر تسترجع كلمة السر', setBioOff:'اضغط للتفعيل — أسرع، وخط نجاة لو نسيت كلمة السر',
+  setBioNA:'البصمة مش متاحة على الجهاز ده',
+  bioEnableT:'تفعيل الدخول بالبصمة', bioEnableMsg:'اكتب كلمة السر الرئيسية مرة واحدة — هتتحفظ مشفّرة جوه شريحة الأمان بتاعة الموبايل ومتتفتحش غير ببصمتك.',
+  bioEnable:'فعّل', bioEnabled:'البصمة اتفعّلت ✓', bioDisabled:'البصمة اتقفلت',
+  bioDisableT:'إيقاف البصمة؟', bioDisableMsg:'هترجع تفتح بكلمة السر بس.', bioOff:'أوقف',
+  bioFailed:'البصمة فشلت — جرب تاني', bioInvalidated:'بصمات الجهاز اتغيرت — فعّل البصمة من جديد',
+  setChpw:'غيّر كلمة السر الرئيسية', setChpwS:'هيعاد تشفير كل حاجة بالجديدة',
+  chOld:'كلمة السر الحالية', chNew:'الجديدة', chNew2:'تأكيد الجديدة', chGo:'غيّر كلمة السر',
+  chShort:'الجديدة لازم 8 أحرف على الأقل', chMismatch:'الجديدة وتأكيدها مش زي بعض', chWrong:'كلمة السر الحالية مش صح',
+  chWait:'ثواني...', chDone:'اتغيّرت ✓ متنساش الجديدة!',
+  setExport:'نسخة احتياطية (تصدير)', setExportS1:'آخر نسخة: ', setExportS0:'لسه معملتش ولا نسخة', setExportS2:' — الملف متشفّر، ينفع تحفظه في أي مكان',
+  setImport:'استرجاع نسخة', setImportS:'هتستبدل كل اللي موجود دلوقتي',
+  exported:'اتصدّرت ✓ — الملف متشفّر ومحتاج كلمة سرك', exportCancel:'التصدير اتلغى',
+  importT:'استرجاع نسخة احتياطية', importMsg:'دي هتستبدل كل اللي في الخزنة دلوقتي بمحتوى النسخة. متأكد؟', importBtn:'استبدل',
+  importBad:'الملف ده مش نسخة صالحة',
+  setUpd:'شيّك على تحديث', setUpdAvail:'تحديث {v} جاهز — دوس للتثبيت', setUpdCur:'الإصدار الحالي: ',
+  updChecking:'بشيّك...', updNone:'انت على آخر إصدار ({v}) ✓', updDl:'بجهّز التحديث...',
+  updInstalling:'شاشة التثبيت هتظهرلك دلوقتي — دوس تحديث', updPerm:'فعّل "السماح من هذا المصدر" من الشاشة اللي فتحت وارجع جرب تاني',
+  updErr:'مشكلة: ', updTryAgain:'حاول تاني',
+  updT:'تحديث متاح 🎉', updMsg:'في إصدار أجدد ({v}) من اللي عندك ({c}). نثبّته دلوقتي؟ بياناتك مش هتتأثر.', updGo:'ثبّت التحديث',
+  updNoUrl:'مفيش لينك تحديثات متظبط',
+  setErase:'امسح الخزنة نهائيًا', setEraseS:'مفيش رجوع في الخطوة دي',
+  eraseT:'مسح الخزنة نهائيًا', eraseMsg:'كل حاجة هتتمسح من الجهاز ده ومفيش أي رجوع. لو متأكد اكتب "امسح" تحت.',
+  bkBanner:'خد نسخة احتياطية! عندك بيانات ومعملتش تصدير من فترة. لو الموبايل ضاع، النسخة دي هي اللي هترجّعلك كل حاجة.',
+  secNote:'🛡️ <b>إزاي محمي؟</b> كل بياناتك متشفّرة AES-256-GCM بمفتاح مشتق من كلمة سرك (PBKDF2 بـ600 ألف دورة) ومحفوظة على جهازك بس — مفيش سيرفر ولا حساب. الاتصال الوحيد هو فحص التحديثات، ومفيش تثبيت غير لتحديث موقّع رسمي. كلمة سرك ما بتتخزنش في أي مكان.',
+  verLine:'Smoyz Safe — إصدار ',
+  typedWord:'اكتب: ',
+  langName:'English'
+},
+en:{
+  suLabel:'Create a master password — it is the key to everything',
+  suPh:'Strong password (12+ chars)', suPh2:'Type it again to confirm',
+  suWarn:'If you forget this password there is NO way to recover your data — everything is encrypted with it and it is never stored anywhere. Enable fingerprint later as a lifeline, and keep it safe.',
+  suBtn:'Create vault', suRestore:'Have a backup? Restore it',
+  suShort:'Password must be at least 8 characters', suMismatch:'Passwords do not match',
+  suMaking:'Setting up your vault...', suDone:'Vault created ✓ only you can open it',
+  lockBrand:'LOCKED 🔒', lkPh:'Master password', lkBtn:'Unlock', lkOpening:'Opening...',
+  lkWrong:'Wrong password', lkDelay:' — delay added after repeated attempts', lkWait:'Wait {n}s...',
+  lkForgot:'Forgot password?', lkBio:'Unlock with fingerprint 👆',
+  forgotT:'Forgot your password?',
+  forgotMsg:'There is no way to recover it — that is the core of the security. If fingerprint unlock is enabled, use it then change your password from Settings. Otherwise the only option is wiping the vault and starting fresh (or restoring a backup you remember the password of). To wipe everything type "DELETE" below.',
+  eraseWord:'DELETE', eraseAllBtn:'Wipe everything',
+  locked:'Locked ✓', lockedAuto:'Auto-locked 🔒',
+  tabPw:'Passwords', tabCards:'Cards', tabMoney:'Money', tabSet:'Settings',
+  searchPh:'Search service or email...',
+  pwEmptyQ:'No results for this search', pwEmpty:'No passwords saved yet.<br>Tap <b>+</b> to add your first one',
+  cardsEmpty:'No cards saved yet.<br>Tap <b>+</b> to add one — everything is encrypted on your device',
+  moneyEmpty:'Nothing recorded yet.<br>Tap <b>+</b> to add a debt, installment or savings circle',
+  copyUser:'Copy email', copyPass:'Copy password', copyNum:'Copy card number',
+  copiedMail:'Email copied', copiedPass:'Password copied', copiedNum:'Card number copied',
+  copied:'Copied', copyClip:' ✓ — clipboard clears in 40s', copyBlocked:'Copy was blocked by the browser',
+  saved:'Saved ✓', deleted:'Deleted', cancel:'Cancel', confirm:'Confirm', save:'Save', saveEdit:'Save changes',
+  pwNew:'New password', pwEdit:'Edit password',
+  fService:'Service', fServicePh:'Google, Facebook, Instagram...', fEmail:'Email / username',
+  fPass:'Password', fUrl:'Link (optional)', fNotes:'Notes (optional)',
+  needService:'Enter the service name first', needPass:'Enter the password',
+  genTitle:'Generate a strong password', genLen:'Length', genUpper:'Uppercase A-Z', genDigits:'Digits 0-9', genSym:'Symbols !@#$', genGo:'Generate',
+  strength:'Strength: ', sWeak:'Weak', sMid:'Medium', sStrong:'Strong', sPerfect:'Excellent 💪',
+  delPwT:'Delete "{x}"?', delMsg:'This cannot be undone.', delBtn:'Delete',
+  delPwBtn:'Delete this password', delCardBtn:'Delete this card', delItemBtn:'Delete permanently',
+  cardNew:'New card', cardEdit:'Edit card',
+  cName:'Card name', cNamePh:'CIB Visa, NBE Mastercard...', cNum:'Card number',
+  cExp:'Expiry', cCvv:'CVV', cHolder:'Cardholder name', cNotes:'Notes (optional — e.g. PIN)',
+  cFull:'Full number', needCName:'Enter the card name first', needCNum:'Card number is incomplete',
+  cardWord:'CARD',
+  pickType:'What do you want to add?',
+  typeDebt:'Debt / loan', typeDebtS:'Money owed to you or by you',
+  typeInst:'Installment', typeInstS:'Monthly installment to a lender (bank, valU, store...)',
+  typeGam:'Savings circle', typeGamS:'Monthly group savings and your payout turn',
+  debtNew:'New debt', debtEdit:'Edit debt',
+  mFor:'Owed to me 💰', mOn:'I owe',
+  mWho:'Who?', mWhoPh:'Person or company name',
+  mAmount:'Amount', mCur:'Currency', mDate:'Date', mNote:'Note (optional)', mNotePh:'Loan, work bill...',
+  needWho:'Enter the name first', needAmount:'Enter the amount',
+  forYou:'Yours', youOwe:'You owe',
+  settledDone:'Settled ✓', settledBack:'Reopened',
+  instNew:'New installment', instEdit:'Edit installment',
+  iTitle:'What is this installment for?', iTitlePh:'Phone, fridge, car...',
+  iFunder:'Lender', iFunderPh:'Bank, valU, Amazon...',
+  iMonthly:'Monthly payment', iDueDay:'Due day (1-31)', iMonths:'Total months', iPaid:'Months paid',
+  needITitle:'Enter the name first', needIFunder:'Enter the lender', needMonthly:'Enter the monthly amount', needMonths:'Enter total months',
+  gamNew:'New savings circle', gamEdit:'Edit savings circle',
+  gTitle:'Circle name', gTitlePh:'Work circle, family circle...',
+  gMonthly:'Monthly payment', gTurn:'Your payout month #',
+  perMonth:'/mo', dueDayS:'day {n}', monthsProg:'{a}/{b} months',
+  payThis:'Paid this month', turnNow:'Your payout is this month 🎉', instDone:'Done! Installment finished 🎉', gamDone:'Done! Circle finished 🎉',
+  secDebts:'Debts', secInst:'Installments', secGam:'Savings circles',
+  payBanner:'{n} payment(s) due this month — do not forget',
+  setLang:'Language / اللغة', setLangS:'Applies instantly to the whole app',
+  setLock:'Auto-lock', setLockS:'Locks by itself when idle', mins:'min',
+  setBio:'Fingerprint unlock', setBioOn:'Enabled — unlock with it, also your password lifeline', setBioOff:'Tap to enable — faster, and a lifeline if you forget the password',
+  setBioNA:'Biometrics not available on this device',
+  bioEnableT:'Enable fingerprint unlock', bioEnableMsg:'Type your master password once — it will be stored encrypted inside the phone security chip and can only be opened with your fingerprint.',
+  bioEnable:'Enable', bioEnabled:'Fingerprint enabled ✓', bioDisabled:'Fingerprint disabled',
+  bioDisableT:'Disable fingerprint?', bioDisableMsg:'You will unlock with the password only.', bioOff:'Disable',
+  bioFailed:'Fingerprint failed — try again', bioInvalidated:'Device biometrics changed — enable fingerprint again',
+  setChpw:'Change master password', setChpwS:'Everything is re-encrypted with the new one',
+  chOld:'Current password', chNew:'New password', chNew2:'Confirm new password', chGo:'Change password',
+  chShort:'New password must be at least 8 characters', chMismatch:'New passwords do not match', chWrong:'Current password is wrong',
+  chWait:'One sec...', chDone:'Changed ✓ do not forget the new one!',
+  setExport:'Backup (export)', setExportS1:'Last backup: ', setExportS0:'No backup yet', setExportS2:' — the file is encrypted, safe to store anywhere',
+  setImport:'Restore backup', setImportS:'Replaces everything currently stored',
+  exported:'Exported ✓ — the file is encrypted and needs your password', exportCancel:'Export cancelled',
+  importT:'Restore backup', importMsg:'This will replace everything in the vault with the backup contents. Sure?', importBtn:'Replace',
+  importBad:'This file is not a valid backup',
+  setUpd:'Check for updates', setUpdAvail:'Update {v} ready — tap to install', setUpdCur:'Current version: ',
+  updChecking:'Checking...', updNone:'You are on the latest version ({v}) ✓', updDl:'Preparing update...',
+  updInstalling:'Install screen will appear — tap Update', updPerm:'Allow "install from this source" in the screen that opened, then try again',
+  updErr:'Problem: ', updTryAgain:'try again',
+  updT:'Update available 🎉', updMsg:'A newer version ({v}) is available (you have {c}). Install now? Your data will not be affected.', updGo:'Install update',
+  updNoUrl:'No update link configured',
+  setErase:'Wipe vault permanently', setEraseS:'There is no way back',
+  eraseT:'Wipe vault permanently', eraseMsg:'Everything will be erased from this device with no way back. If sure, type "DELETE" below.',
+  bkBanner:'Take a backup! You have data and have not exported in a while. If the phone is lost, that backup is what brings everything back.',
+  secNote:'🛡️ <b>How is it protected?</b> Everything is encrypted with AES-256-GCM using a key derived from your password (PBKDF2, 600k rounds) and stored only on your device — no server, no accounts. The only connection is the update check, and nothing installs unless officially signed. Your password is never stored anywhere.',
+  verLine:'Smoyz Safe — version ',
+  typedWord:'Type: ',
+  langName:'العربية'
+}};
+let lang=localStorage.getItem(LS_LANG)||'ar';
+if(!L[lang])lang='ar';
+function t(k,vars){
+  let s=(L[lang]&&L[lang][k])??L.ar[k]??k;
+  if(vars)for(const v in vars)s=s.split('{'+v+'}').join(vars[v]);
+  return s;
+}
+function applyLangStatic(){
+  document.documentElement.setAttribute('dir',lang==='ar'?'rtl':'ltr');
+  document.documentElement.setAttribute('lang',lang==='ar'?'ar-EG':'en');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
+  $('#su-pw').placeholder=t('suPh');$('#su-pw2').placeholder=t('suPh2');
+  $('#lk-pw').placeholder=t('lkPh');$('#lock-brand').textContent=t('lockBrand');
+  $('#lk-bio').textContent=t('lkBio');
+  $('#lang-sw-setup').textContent=t('langName');
+  $('#lang-sw-lock').textContent=t('langName');
+  $('#cf-no').textContent=t('cancel');
+  if(window.Khazna&&window.Khazna.setLang){try{window.Khazna.setLang(lang)}catch(e){}}
+}
+function toggleLang(){
+  lang=(lang==='ar')?'en':'ar';
+  localStorage.setItem(LS_LANG,lang);
+  applyLangStatic();
+  if(vault){renderTabs();renderTab()}
+}
+
+/* ================= أيقونات ================= */
 const P={
   shield:'<path d="M12 22s8-3.6 8-10V5.5L12 2 4 5.5V12c0 6.4 8 10 8 10z"/><path d="M8.8 12l2.2 2.2 4.4-4.6"/>',
   lock:'<rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
@@ -430,7 +660,12 @@ const P={
   at:'<circle cx="12" cy="12" r="4"/><path d="M16 8v5a2.5 2.5 0 0 0 5 0v-1a9 9 0 1 0-3.5 7.1"/>',
   alert:'<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
-  loader:'<path d="M12 3a9 9 0 1 0 9 9"/>'
+  loader:'<path d="M12 3a9 9 0 1 0 9 9"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.8"/><path d="M16 14.6a5.6 5.6 0 0 1 5.5 5.4"/>',
+  bell:'<path d="M18 9a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.5 21a2 2 0 0 0 3 0"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13.4 13.4 0 0 1 0 18 13.4 13.4 0 0 1 0-18z"/>',
+  finger:'<path d="M7 19.5c-1.2-2-2-4.2-2-6.5a7 7 0 0 1 14 0c0 1.2-.1 2.4-.4 3.5"/><path d="M12 9.5a3.5 3.5 0 0 1 3.5 3.5c0 2.6.4 4.6 1 6.5"/><path d="M12 13v3.5c0 1.8.3 3.3.8 4.5"/><path d="M8.5 13a3.5 3.5 0 0 1 3.5-3.5"/>'
 };
 const ic=n=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
 
@@ -439,7 +674,6 @@ const enc=new TextEncoder(), dec=new TextDecoder();
 function bufB64(buf){const u=new Uint8Array(buf);let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)}
 function b64Buf(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
 const KDF_ITER=600000;
-
 async function deriveKey(password,salt,iter){
   const km=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveKey']);
   return crypto.subtle.deriveKey(
@@ -458,27 +692,14 @@ async function decryptVault(key,blob){
 }
 
 /* ================= تخزين ================= */
-const APP_VERSION='1.6'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=7;       // بيتبمب تلقائيًا من release.ps1
-const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json'; // قناة التحديثات الرسمية — مدمجة، المستخدم مش محتاج يجيب أي لينك
-const LS_KEY='smoyz.safe.v1';
-const LS_GUARD='smoyz.safe.guard';
-/* ترحيل بيانات النسخ القديمة (قبل تغيير الاسم) — مرة واحدة وبيمسح القديم */
-try{
-  const _old='vancore.khazna.v1', _oldG='vancore.khazna.guard';
-  if(!localStorage.getItem(LS_KEY)&&localStorage.getItem(_old)){
-    localStorage.setItem(LS_KEY,localStorage.getItem(_old));
-    localStorage.removeItem(_old);localStorage.removeItem(_oldG);
-  }
-}catch(e){}
 function loadBlob(){try{const b=JSON.parse(localStorage.getItem(LS_KEY));return (b&&b.v===1&&b.kdf&&b.cipher)?b:null}catch(e){return null}}
 function saveBlob(b){localStorage.setItem(LS_KEY,JSON.stringify(b))}
 function loadGuard(){try{return JSON.parse(localStorage.getItem(LS_GUARD))||{n:0,until:0}}catch(e){return{n:0,until:0}}}
 function saveGuard(g){localStorage.setItem(LS_GUARD,JSON.stringify(g))}
 
 /* ================= حالة ================= */
-let vault=null;        // البيانات المفكوكة في الذاكرة وقت الفتح بس
-let cryptoKey=null;    // مفتاح الجلسة — غير قابل للتصدير
+let vault=null;
+let cryptoKey=null;
 let currentTab='pw';
 let pwSearch='';
 let lastActivity=Date.now();
@@ -496,19 +717,20 @@ async function persist(){
 /* ================= Toast + Confirm ================= */
 let toastT=null;
 function toast(msg){
-  const t=$('#toast');t.textContent=msg;t.classList.add('on');
-  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200);
+  const el=$('#toast');el.textContent=msg;el.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2200);
 }
 function confirmDlg(title,msg,opts={}){
   return new Promise(res=>{
     $('#cf-title').textContent=title;
     $('#cf-msg').textContent=msg;
     const inp=$('#cf-input'), yes=$('#cf-yes'), no=$('#cf-no');
+    no.textContent=t('cancel');
     if(opts.requireText){
-      inp.style.display='block';inp.value='';inp.placeholder='اكتب: '+opts.requireText;
+      inp.style.display='block';inp.value='';inp.placeholder=t('typedWord')+opts.requireText;
     } else inp.style.display='none';
     yes.className='btn '+(opts.danger?'btn-danger':'btn-flame');
-    yes.textContent=opts.yesLabel||'تأكيد';
+    yes.textContent=opts.yesLabel||t('confirm');
     $('#cf-bk').classList.add('on');
     const done=v=>{$('#cf-bk').classList.remove('on');yes.onclick=no.onclick=null;res(v)};
     yes.onclick=()=>{
@@ -519,9 +741,9 @@ function confirmDlg(title,msg,opts={}){
   });
 }
 
-/* ================= نسخ للكليبورد ================= */
+/* ================= نسخ ================= */
 let clipTimer=null;
-async function copyText(txt,{sensitive=false,label='اتنسخ'}={}){
+async function copyText(txt,{sensitive=false,label=null}={}){
   let ok=false;
   try{await navigator.clipboard.writeText(txt);ok=true}
   catch(e){
@@ -530,15 +752,15 @@ async function copyText(txt,{sensitive=false,label='اتنسخ'}={}){
       document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove();
     }catch(e2){}
   }
-  if(!ok){toast('النسخ اتمنع من المتصفح');return}
-  toast(sensitive? label+' ✓ — هيتمسح من الكليبورد بعد ٤٠ ثانية' : label+' ✓');
+  if(!ok){toast(t('copyBlocked'));return}
+  toast(sensitive? (label||t('copied'))+t('copyClip') : (label||t('copied'))+' ✓');
   if(sensitive){
     clearTimeout(clipTimer);
     clipTimer=setTimeout(()=>{navigator.clipboard.writeText('').catch(()=>{})},40000);
   }
 }
 
-/* ================= قوة كلمة السر + التوليد ================= */
+/* ================= قوة + توليد ================= */
 function strength(pw){
   if(!pw) return {bits:0,label:'',color:'var(--danger)',pct:0};
   let pool=0;
@@ -548,13 +770,13 @@ function strength(pw){
   if(/[^a-zA-Z0-9]/.test(pw))pool+=32;
   const bits=Math.round(pw.length*Math.log2(pool||1));
   let label,color;
-  if(bits<45){label='ضعيفة';color='var(--danger)'}
-  else if(bits<70){label='متوسطة';color='var(--amber)'}
-  else if(bits<95){label='قوية';color='var(--ok)'}
-  else{label='ممتازة 💪';color='var(--ok)'}
+  if(bits<45){label=t('sWeak');color='var(--danger)'}
+  else if(bits<70){label=t('sMid');color='var(--amber)'}
+  else if(bits<95){label=t('sStrong');color='var(--ok)'}
+  else{label=t('sPerfect');color='var(--ok)'}
   return {bits,label,color,pct:Math.min(100,Math.round(bits/110*100))};
 }
-function randInt(max){ // بدون انحياز modulo
+function randInt(max){
   const lim=Math.floor(0x100000000/max)*max;
   const a=new Uint32Array(1);
   do{crypto.getRandomValues(a)}while(a[0]>=lim);
@@ -581,20 +803,25 @@ const nfmt=new Intl.NumberFormat('en-US',{maximumFractionDigits:2});
 const fmtAmt=n=>nfmt.format(n);
 function fmtDate(iso){
   if(!iso)return'';
-  const [y,m,d]=iso.split('-');
-  return d+'/'+m+'/'+y;
+  const p=iso.split('-');
+  return p[2]+'/'+p[1]+'/'+p[0];
 }
 function todayISO(){
   const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
+function monthKey(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+const defCur=()=>lang==='ar'?'ج.م':'EGP';
 function cardBrand(num){
   const n=(num||'').replace(/\D/g,'');
-  if(/^(507803|507808|507809|9)/.test(n))return{t:'ميزة',cls:'meeza'};
-  if(/^4/.test(n))return{t:'VISA',cls:''};
-  if(/^5[1-5]/.test(n)||/^2[2-7]/.test(n))return{t:'MASTERCARD',cls:''};
-  if(/^3[47]/.test(n))return{t:'AMEX',cls:''};
-  return{t:'كارت',cls:'meeza'};
+  if(/^(507803|507808|507809|9)/.test(n))return{t2:'ميزة',cls:'meeza'};
+  if(/^4/.test(n))return{t2:'VISA',cls:''};
+  if(/^5[1-5]/.test(n)||/^2[2-7]/.test(n))return{t2:'MASTERCARD',cls:''};
+  if(/^3[47]/.test(n))return{t2:'AMEX',cls:''};
+  return{t2:t('cardWord'),cls:'meeza'};
 }
 const maskNum=num=>{const n=(num||'').replace(/\D/g,'');return n? '•••• '+n.slice(-4):''};
 const groupNum=num=>(num||'').replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim();
@@ -603,6 +830,27 @@ const groupNum=num=>(num||'').replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim();
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   $(id).classList.add('on');
+}
+
+/* -------- البصمة -------- */
+function bioStatus(){
+  try{return (window.Khazna&&window.Khazna.biometricStatus)? window.Khazna.biometricStatus():'unavailable'}
+  catch(e){return 'unavailable'}
+}
+let bioAutoTried=false;
+window.__khaznaBioUnlock=pw=>{
+  if(typeof pw==='string'&&pw)unlockWith(pw,true);
+};
+window.__khaznaBioState=st=>{
+  if(st==='enabled'){toast(t('bioEnabled'));closeSheet();if(vault&&currentTab==='set')renderTab()}
+  else if(st==='invalidated'){toast(t('bioInvalidated'));if(vault&&currentTab==='set')renderTab()}
+};
+function showBioButton(){
+  const b=$('#lk-bio');
+  if(bioStatus()==='enabled'){
+    b.style.display='flex';
+    if(!bioAutoTried){bioAutoTried=true;setTimeout(()=>{try{window.Khazna.biometricUnlock()}catch(e){}},450)}
+  } else b.style.display='none';
 }
 
 function boot(){
@@ -614,24 +862,27 @@ function boot(){
   $('#sheet-x').innerHTML=ic('x');
   $('#su-warn-ic').innerHTML=ic('alert');
   document.querySelectorAll('.peek').forEach(b=>b.innerHTML=ic('eye'));
-
-  if(loadBlob()){show('#scr-lock');setTimeout(()=>$('#lk-pw').focus(),80)}
+  applyLangStatic();
+  if(loadBlob()){show('#scr-lock');showBioButton();setTimeout(()=>$('#lk-pw').focus(),80)}
   else{show('#scr-setup')}
 }
+$('#lang-sw-setup').addEventListener('click',toggleLang);
+$('#lang-sw-lock').addEventListener('click',toggleLang);
+$('#lk-bio').addEventListener('click',()=>{try{window.Khazna.biometricUnlock()}catch(e){}});
 
-/* -------- الإنشاء الأول -------- */
+/* -------- الإنشاء -------- */
 $('#su-pw').addEventListener('input',e=>{
   const s=strength(e.target.value);
   const m=$('#su-meter');m.style.width=s.pct+'%';m.style.background=s.color;
-  $('#su-meter-lbl').textContent=e.target.value? 'القوة: '+s.label:'';
+  $('#su-meter-lbl').textContent=e.target.value? t('strength')+s.label:'';
 });
 $('#setup-form').addEventListener('submit',async e=>{
   e.preventDefault();
   const pw=$('#su-pw').value, pw2=$('#su-pw2').value, err=$('#su-err');
   err.textContent='';
-  if(pw.length<8){err.textContent='كلمة السر لازم تكون 8 أحرف على الأقل';return}
-  if(pw!==pw2){err.textContent='الكلمتين مش زي بعض';return}
-  const btn=$('#su-btn');btn.disabled=true;btn.innerHTML='<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+P.loader+'</svg> بجهّز الخزنة...';
+  if(pw.length<8){err.textContent=t('suShort');return}
+  if(pw!==pw2){err.textContent=t('suMismatch');return}
+  const btn=$('#su-btn');btn.disabled=true;btn.innerHTML='<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+P.loader+'</svg> '+t('suMaking');
   try{
     const salt=crypto.getRandomValues(new Uint8Array(16));
     const kdf={alg:'PBKDF2-SHA256',iter:KDF_ITER,salt:bufB64(salt)};
@@ -641,8 +892,8 @@ $('#setup-form').addEventListener('submit',async e=>{
     saveGuard({n:0,until:0});
     if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
     openMain();
-    toast('اتعملت الخزنة ✓ محدش يقدر يفتحها غيرك');
-  }catch(ex){err.textContent='حصلت مشكلة: '+ex.message;btn.disabled=false;btn.textContent='أنشئ الخزنة'}
+    toast(t('suDone'));
+  }catch(ex){err.textContent=String(ex.message);btn.disabled=false;btn.textContent=t('suBtn')}
 });
 $('#su-restore').addEventListener('click',()=>importBackup(true));
 
@@ -657,79 +908,82 @@ function tickGuard(){
   const btn=$('#lk-btn');
   const upd=()=>{
     const w=guardWait();
-    if(w>0){btn.disabled=true;btn.textContent='استنى '+w+' ثانية...'}
-    else{btn.disabled=false;btn.textContent='افتح الخزنة';clearInterval(guardTicker)}
+    if(w>0){btn.disabled=true;btn.textContent=t('lkWait',{n:w})}
+    else{btn.disabled=false;btn.textContent=t('lkBtn');clearInterval(guardTicker)}
   };
   upd();guardTicker=setInterval(upd,1000);
 }
-$('#lock-form').addEventListener('submit',async e=>{
-  e.preventDefault();
-  if(guardWait()>0)return;
-  const pw=$('#lk-pw').value, err=$('#lk-err'), btn=$('#lk-btn');
-  if(!pw)return;
+async function unlockWith(pw,fromBio){
+  if(guardWait()>0&&!fromBio)return;
+  const err=$('#lk-err'), btn=$('#lk-btn');
   err.textContent='';
-  btn.disabled=true;btn.innerHTML='<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+P.loader+'</svg> بفتح...';
+  btn.disabled=true;btn.innerHTML='<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+P.loader+'</svg> '+t('lkOpening');
   try{
     const blob=loadBlob();
     const key=await deriveKey(pw,b64Buf(blob.kdf.salt),blob.kdf.iter);
     vault=await decryptVault(key,blob);
     cryptoKey=key;
     if(!vault.settings)vault.settings={autolockMin:3,lastExport:0};
+    vault.money.forEach(m=>{if(!m.kind)m.kind='debt'});
     saveGuard({n:0,until:0});
     $('#lk-pw').value='';
+    btn.disabled=false;btn.textContent=t('lkBtn');
     openMain();
   }catch(ex){
     const g=loadGuard();g.n++;
     if(g.n>=3)g.until=Date.now()+Math.min(5*Math.pow(2,g.n-3),300)*1000;
     saveGuard(g);
-    err.textContent='كلمة السر مش صح'+(g.n>=3?' — في تأخير بسبب المحاولات المتكررة':'');
+    err.textContent=fromBio? t('bioFailed') : t('lkWrong')+(g.n>=3?t('lkDelay'):'');
     $('#lock-form').classList.add('shake');
     setTimeout(()=>$('#lock-form').classList.remove('shake'),450);
-    btn.disabled=false;btn.textContent='افتح الخزنة';
+    btn.disabled=false;btn.textContent=t('lkBtn');
     tickGuard();
   }
+}
+$('#lock-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const pw=$('#lk-pw').value;
+  if(pw)unlockWith(pw,false);
 });
 $('#lk-forgot').addEventListener('click',async()=>{
-  const yes=await confirmDlg('نسيت كلمة السر؟',
-    'مفيش أي طريقة لاسترجاعها — دي أساس الأمان. الحل الوحيد إنك تمسح الخزنة وتبدأ من جديد (أو تسترجع نسخة احتياطية قديمة لسه فاكر كلمة سرها). عشان تمسح كل حاجة نهائيًا اكتب "امسح" تحت.',
-    {danger:true,requireText:'امسح',yesLabel:'امسح كل حاجة'});
+  const yes=await confirmDlg(t('forgotT'),t('forgotMsg'),{danger:true,requireText:t('eraseWord'),yesLabel:t('eraseAllBtn')});
   if(yes){localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_GUARD);location.reload()}
 });
 
 /* -------- القفل -------- */
 function lock(){
-  vault=null;cryptoKey=null;pwSearch='';
+  vault=null;cryptoKey=null;pwSearch='';bioAutoTried=true;
   $('#content').innerHTML='';
   closeSheet();
   $('#cf-bk').classList.remove('on');
   show('#scr-lock');
+  showBioButton();
   $('#lk-err').textContent='';
   setTimeout(()=>$('#lk-pw').focus(),80);
 }
-$('#btn-lock').addEventListener('click',()=>{lock();toast('اتقفلت ✓')});
+$('#btn-lock').addEventListener('click',()=>{lock();toast(t('locked'))});
 
-/* قفل تلقائي: خمول + ترك الصفحة */
 ['pointerdown','keydown','touchstart','input'].forEach(ev=>
   document.addEventListener(ev,()=>{lastActivity=Date.now()},{passive:true}));
 setInterval(()=>{
   if(!vault)return;
   const mins=(vault.settings&&vault.settings.autolockMin)||3;
-  if(Date.now()-lastActivity>mins*60000){lock();toast('اتقفلت تلقائيًا 🔒')}
+  if(Date.now()-lastActivity>mins*60000){lock();toast(t('lockedAuto'))}
 },10000);
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){hiddenAt=Date.now()}
   else{
-    if(vault&&hiddenAt&&Date.now()-hiddenAt>60000){lock();toast('اتقفلت تلقائيًا 🔒')}
+    if(vault&&hiddenAt&&Date.now()-hiddenAt>60000){lock();toast(t('lockedAuto'))}
     hiddenAt=null;
   }
 });
 
 /* -------- الرئيسية -------- */
 const TABS=[
-  {id:'pw',label:'الباسوردات',icon:'key'},
-  {id:'cards',label:'الكروت',icon:'card'},
-  {id:'money',label:'الفلوس',icon:'cash'},
-  {id:'set',label:'الإعدادات',icon:'sliders'},
+  {id:'pw',key:'tabPw',icon:'key'},
+  {id:'cards',key:'tabCards',icon:'card'},
+  {id:'money',key:'tabMoney',icon:'cash'},
+  {id:'set',key:'tabSet',icon:'sliders'},
 ];
 function needBackup(){
   if(!vault)return false;
@@ -737,10 +991,19 @@ function needBackup(){
   const last=(vault.settings&&vault.settings.lastExport)||0;
   return items>0&&(Date.now()-last>30*24*3600*1000);
 }
+function pendingPayments(){
+  if(!vault)return 0;
+  const mk=monthKey();
+  return vault.money.filter(m=>(m.kind==='installment'||m.kind==='gamiya')&&!m.settled&&m.lastPaidMonth!==mk).length;
+}
+function reminderSync(){
+  if(!window.Khazna||!window.Khazna.setMonthlyReminder)return;
+  try{window.Khazna.setMonthlyReminder(pendingPayments()>0,lang)}catch(e){}
+}
 
-/* ---- التحديثات (نسخة التطبيق بس) ---- */
-let updAvailable=null; // اسم الإصدار المتاح لو في تحديث
-let updSilent=false;   // الفحص التلقائي اليومي بيبقى صامت
+/* ---- التحديثات ---- */
+let updAvailable=null;
+let updSilent=false;
 function updUrl(){return ((vault&&vault.settings&&vault.settings.updateUrl)||DEFAULT_UPDATE_URL).trim()}
 function maybeAutoCheckUpdate(){
   if(!window.Khazna||!window.Khazna.checkUpdate||!vault)return;
@@ -753,28 +1016,29 @@ function maybeAutoCheckUpdate(){
 }
 window.__khaznaUpdateState=async o=>{
   const st=o.state, info=o.info||'', el=$('#upd-status'), silent=updSilent;
-  if(st==='checking'){if(el&&!silent)el.textContent='بشيّك...';return}
+  if(st==='checking'){if(el&&!silent)el.textContent=t('updChecking');return}
   if(st==='available'){
     updSilent=false;updAvailable=info;
     if(vault){renderTabs();if(currentTab==='set')renderTab()}
-    const yes=await confirmDlg('تحديث متاح 🎉','في إصدار أجدد ('+info+') من اللي عندك ('+APP_VERSION+'). نثبّته دلوقتي؟ بياناتك مش هتتأثر — التحديث بيتركب فوق التطبيق زي ما هو.',{yesLabel:'ثبّت التحديث'});
+    const yes=await confirmDlg(t('updT'),t('updMsg',{v:info,c:APP_VERSION}),{yesLabel:t('updGo')});
     if(yes&&window.Khazna)window.Khazna.installUpdate();
     return;
   }
   updSilent=false;
-  if(silent)return; // الفحص الصامت ميشوّشش لو مفيش جديد
+  if(silent)return;
   if(!el)return;
-  if(st==='none')el.textContent='انت على آخر إصدار ('+APP_VERSION+') ✓';
-  else if(st==='downloading')el.textContent='بجهّز التحديث...';
-  else if(st==='installing')el.textContent='شاشة التثبيت هتظهرلك دلوقتي — دوس تحديث';
-  else if(st==='needPermission')el.textContent='فعّل "السماح من هذا المصدر" من الشاشة اللي فتحت، وارجع دوس "شيّك على تحديث" وثبّت تاني';
-  else if(st==='error')el.textContent='مشكلة: '+(info||'حاول تاني');
+  if(st==='none')el.textContent=t('updNone',{v:APP_VERSION});
+  else if(st==='downloading')el.textContent=t('updDl');
+  else if(st==='installing')el.textContent=t('updInstalling');
+  else if(st==='needPermission')el.textContent=t('updPerm');
+  else if(st==='error')el.textContent=t('updErr')+(info||t('updTryAgain'));
 };
+
 function renderTabs(){
-  $('#tabs').innerHTML=TABS.map(t=>
-    '<button data-tab="'+t.id+'" class="'+(currentTab===t.id?'on':'')+'" aria-label="'+t.label+'">'+
-    (t.id==='set'&&(needBackup()||updAvailable)?'<span class="dot"></span>':'')+
-    ic(t.icon)+'<span>'+t.label+'</span></button>').join('');
+  $('#tabs').innerHTML=TABS.map(tb=>
+    '<button data-tab="'+tb.id+'" class="'+(currentTab===tb.id?'on':'')+'" aria-label="'+t(tb.key)+'">'+
+    ((tb.id==='set'&&(needBackup()||updAvailable))||(tb.id==='money'&&pendingPayments()>0)?'<span class="dot"></span>':'')+
+    ic(tb.icon)+'<span>'+t(tb.key)+'</span></button>').join('');
 }
 function openMain(){
   currentTab='pw';
@@ -782,6 +1046,7 @@ function openMain(){
   $('#scr-main').classList.add('fade-in');
   renderTabs();renderTab();
   maybeAutoCheckUpdate();
+  reminderSync();
 }
 $('#tabs').addEventListener('click',e=>{
   const b=e.target.closest('[data-tab]');if(!b)return;
@@ -790,7 +1055,7 @@ $('#tabs').addEventListener('click',e=>{
 $('#fab').addEventListener('click',()=>{
   if(currentTab==='pw')openPwForm();
   else if(currentTab==='cards')openCardForm();
-  else if(currentTab==='money')openMoneyForm();
+  else if(currentTab==='money')openMoneyPicker();
 });
 
 function renderTab(){
@@ -806,7 +1071,7 @@ function renderTab(){
 /* -------- الباسوردات -------- */
 function renderPw(c){
   c.innerHTML=
-    '<div class="search">'+ic('search')+'<input type="search" id="pw-q" placeholder="دوّر على خدمة أو إيميل..." autocomplete="off" value="'+esc(pwSearch)+'"></div>'+
+    '<div class="search">'+ic('search')+'<input type="search" id="pw-q" placeholder="'+esc(t('searchPh'))+'" autocomplete="off" value="'+esc(pwSearch)+'"></div>'+
     '<div id="pw-list" style="display:flex;flex-direction:column;gap:10px"></div>';
   $('#pw-q').addEventListener('input',e=>{pwSearch=e.target.value;renderPwList()});
   renderPwList();
@@ -815,10 +1080,10 @@ function renderPwList(){
   const q=pwSearch.trim().toLowerCase();
   const list=vault.passwords
     .filter(p=>!q||[p.title,p.email,p.url,p.notes].join(' ').toLowerCase().includes(q))
-    .sort((a,b)=>(a.title||'').localeCompare(b.title||'','ar'));
+    .sort((a,b)=>(a.title||'').localeCompare(b.title||'',lang==='ar'?'ar':'en'));
   const el=$('#pw-list');if(!el)return;
   if(!list.length){
-    el.innerHTML='<div class="empty">'+ic('key')+'<span>'+(q?'مفيش نتايج للبحث ده':'لسه مفيش باسوردات محفوظة.<br>دوس <b>+</b> وابدأ ضيف أول واحد')+'</span></div>';
+    el.innerHTML='<div class="empty">'+ic('key')+'<span>'+(q?t('pwEmptyQ'):t('pwEmpty'))+'</span></div>';
     return;
   }
   el.innerHTML=list.map(p=>
@@ -827,8 +1092,8 @@ function renderPwList(){
       '<div class="row-main"><div class="row-t">'+esc(p.title)+'</div>'+
       (p.email?'<div class="row-s ltr">'+esc(p.email)+'</div>':'')+'</div>'+
       '<div class="row-acts">'+
-        (p.email?'<button class="icon-btn" data-act="copy-user" data-id="'+p.id+'" aria-label="انسخ الإيميل">'+ic('at')+'</button>':'')+
-        '<button class="icon-btn" data-act="copy-pass" data-id="'+p.id+'" aria-label="انسخ الباسورد">'+ic('copy')+'</button>'+
+        (p.email?'<button class="icon-btn" data-act="copy-user" data-id="'+p.id+'" aria-label="'+t('copyUser')+'">'+ic('at')+'</button>':'')+
+        '<button class="icon-btn" data-act="copy-pass" data-id="'+p.id+'" aria-label="'+t('copyPass')+'">'+ic('copy')+'</button>'+
       '</div>'+
     '</div>').join('');
 }
@@ -836,7 +1101,7 @@ function renderPwList(){
 /* -------- الكروت -------- */
 function renderCards(c){
   if(!vault.cards.length){
-    c.innerHTML='<div class="empty">'+ic('card')+'<span>لسه مفيش كروت محفوظة.<br>دوس <b>+</b> وضيف أول كارت — كله متشفّر على جهازك</span></div>';
+    c.innerHTML='<div class="empty">'+ic('card')+'<span>'+t('cardsEmpty')+'</span></div>';
     return;
   }
   c.innerHTML=vault.cards.map(cd=>{
@@ -845,82 +1110,116 @@ function renderCards(c){
       '<div class="row-ic cy">'+ic('card')+'</div>'+
       '<div class="row-main"><div class="row-t">'+esc(cd.name)+'</div>'+
       '<div class="row-s mono num ltr">'+maskNum(cd.number)+(cd.expiry?'&nbsp;&nbsp;·&nbsp;&nbsp;'+esc(cd.expiry):'')+'</div></div>'+
-      '<span class="chip '+br.cls+'">'+esc(br.t)+'</span>'+
-      '<button class="icon-btn" data-act="copy-num" data-id="'+cd.id+'" aria-label="انسخ رقم الكارت">'+ic('copy')+'</button>'+
+      '<span class="chip '+br.cls+'">'+esc(br.t2)+'</span>'+
+      '<button class="icon-btn" data-act="copy-num" data-id="'+cd.id+'" aria-label="'+t('copyNum')+'">'+ic('copy')+'</button>'+
     '</div>';
   }).join('');
 }
 
 /* -------- الفلوس -------- */
 function moneyTotals(){
-  const t={};
-  vault.money.filter(m=>!m.settled).forEach(m=>{
-    const cur=m.currency||'ج.م';
-    t[cur]=t[cur]||{pos:0,neg:0};
-    if(m.dir==='lya')t[cur].pos+=Number(m.amount)||0;
-    else t[cur].neg+=Number(m.amount)||0;
+  const tt={};
+  vault.money.filter(m=>m.kind==='debt'&&!m.settled).forEach(m=>{
+    const cur=m.currency||defCur();
+    tt[cur]=tt[cur]||{pos:0,neg:0};
+    if(m.dir==='lya')tt[cur].pos+=Number(m.amount)||0;
+    else tt[cur].neg+=Number(m.amount)||0;
   });
-  return t;
+  return tt;
+}
+function instRow(m){
+  const mk=monthKey();
+  const paidThis=m.lastPaidMonth===mk;
+  const isGam=m.kind==='gamiya';
+  const cycle=(m.monthsPaid||0)+1;
+  const turn=isGam&&!m.settled&&cycle===Number(m.myTurn||0);
+  const pct=Math.min(100,Math.round(((m.monthsPaid||0)/(m.monthsTotal||1))*100));
+  let sub=esc(m.funder||'')+(m.funder?' · ':'')+fmtAmt(Number(m.monthly)||0)+' '+esc(m.currency||defCur())+t('perMonth')+
+    ' · '+t('monthsProg',{a:m.monthsPaid||0,b:m.monthsTotal||0})+
+    (m.dueDay?' · '+t('dueDayS',{n:m.dueDay}):'');
+  if(turn)sub+=' · <span class="turn-note">'+t('turnNow')+'</span>';
+  return '<div class="row'+(m.settled?' settled':'')+'" data-act="open-money" data-id="'+m.id+'">'+
+    '<button class="icon-btn settle-btn'+(paidThis?' done':'')+'" data-act="pay-month" data-id="'+m.id+'" aria-label="'+t('payThis')+'">'+ic('check')+'</button>'+
+    '<div class="row-main"><div class="row-t">'+esc(m.title)+'</div>'+
+    '<div class="row-s">'+sub+'</div>'+
+    '<div class="prog"><i style="width:'+pct+'%"></i></div></div>'+
+    '<div class="row-ic '+(isGam?'vi':'cy')+'" style="width:34px;height:34px">'+ic(isGam?'users':'cal')+'</div>'+
+  '</div>';
 }
 function renderMoney(c){
-  const t=moneyTotals();
-  const curs=Object.keys(t);
-  let sum='';
+  const pend=pendingPayments();
+  const tt=moneyTotals();
+  const curs=Object.keys(tt);
+  let html='';
+  if(pend>0)html+='<div class="pay-banner">'+ic('bell')+'<span>'+t('payBanner',{n:pend})+'</span></div>';
   if(curs.length){
-    sum='<div class="mny-sum num">'+curs.map(cur=>
-      '<span><small>ليك&nbsp;</small><span class="pos">'+fmtAmt(t[cur].pos)+' '+esc(cur)+'</span></span>'+
-      '<span><small>عليك&nbsp;</small><span class="neg">'+fmtAmt(t[cur].neg)+' '+esc(cur)+'</span></span>'
+    html+='<div class="mny-sum num">'+curs.map(cur=>
+      '<span><small>'+t('forYou')+'&nbsp;</small><span class="pos">'+fmtAmt(tt[cur].pos)+' '+esc(cur)+'</span></span>'+
+      '<span><small>'+t('youOwe')+'&nbsp;</small><span class="neg">'+fmtAmt(tt[cur].neg)+' '+esc(cur)+'</span></span>'
     ).join('')+'</div>';
   }
-  const list=[...vault.money].sort((a,b)=>(a.settled?1:0)-(b.settled?1:0)||(b.date||'').localeCompare(a.date||''));
-  if(!list.length){
-    c.innerHTML='<div class="empty">'+ic('cash')+'<span>لسه مفيش مبالغ متسجلة.<br>دوس <b>+</b> وسجّل أول مبلغ — ليك أو عليك</span></div>';
+  const debts=vault.money.filter(m=>m.kind==='debt').sort((a,b)=>(a.settled?1:0)-(b.settled?1:0)||(b.date||'').localeCompare(a.date||''));
+  const insts=vault.money.filter(m=>m.kind==='installment').sort((a,b)=>(a.settled?1:0)-(b.settled?1:0));
+  const gams=vault.money.filter(m=>m.kind==='gamiya').sort((a,b)=>(a.settled?1:0)-(b.settled?1:0));
+  if(!debts.length&&!insts.length&&!gams.length){
+    c.innerHTML='<div class="empty">'+ic('cash')+'<span>'+t('moneyEmpty')+'</span></div>';
     return;
   }
-  c.innerHTML=sum+list.map(m=>{
-    const pos=m.dir==='lya';
-    return '<div class="row'+(m.settled?' settled':'')+'" data-act="open-money" data-id="'+m.id+'">'+
-      '<button class="icon-btn settle-btn'+(m.settled?' done':'')+'" data-act="settle" data-id="'+m.id+'" aria-label="اتسوّت">'+ic('check')+'</button>'+
-      '<div class="row-main"><div class="row-t">'+esc(m.person)+'</div>'+
-      '<div class="row-s">'+(pos?'ليك':'عليك')+(m.date?' · '+fmtDate(m.date):'')+(m.note?' · '+esc(m.note):'')+'</div></div>'+
-      '<span class="num '+(pos?'amt-pos':'amt-neg')+'" style="font-size:1.02rem">'+(pos?'':'−')+fmtAmt(Number(m.amount)||0)+' <small style="font-weight:400;font-size:.72rem">'+esc(m.currency||'ج.م')+'</small></span>'+
-    '</div>';
-  }).join('');
+  if(insts.length)html+='<div class="sec-h">'+ic('cal')+t('secInst')+'</div>'+insts.map(instRow).join('');
+  if(gams.length)html+='<div class="sec-h">'+ic('users')+t('secGam')+'</div>'+gams.map(instRow).join('');
+  if(debts.length){
+    html+='<div class="sec-h">'+ic('cash')+t('secDebts')+'</div>'+debts.map(m=>{
+      const pos=m.dir==='lya';
+      return '<div class="row'+(m.settled?' settled':'')+'" data-act="open-money" data-id="'+m.id+'">'+
+        '<button class="icon-btn settle-btn'+(m.settled?' done':'')+'" data-act="settle" data-id="'+m.id+'" aria-label="'+t('settledDone')+'">'+ic('check')+'</button>'+
+        '<div class="row-main"><div class="row-t">'+esc(m.person)+'</div>'+
+        '<div class="row-s">'+(pos?t('forYou'):t('youOwe'))+(m.date?' · '+fmtDate(m.date):'')+(m.note?' · '+esc(m.note):'')+'</div></div>'+
+        '<span class="num '+(pos?'amt-pos':'amt-neg')+'" style="font-size:1.02rem">'+(pos?'':'−')+fmtAmt(Number(m.amount)||0)+' <small style="font-weight:400;font-size:.72rem">'+esc(m.currency||defCur())+'</small></span>'+
+      '</div>';
+    }).join('');
+  }
+  c.innerHTML=html;
 }
 
 /* -------- الإعدادات -------- */
 function renderSettings(c){
   const s=vault.settings;
-  const lastEx=s.lastExport? 'آخر نسخة: '+new Date(s.lastExport).toLocaleDateString('ar-EG'):'لسه معملتش ولا نسخة';
+  const lastEx=s.lastExport? t('setExportS1')+new Date(s.lastExport).toLocaleDateString(lang==='ar'?'ar-EG':'en-GB'):t('setExportS0');
+  const bio=bioStatus();
+  let bioRow='';
+  if(window.Khazna&&bio!=='unavailable'){
+    bioRow='<button class="set-item" data-act="bio">'+ic('finger')+'<div class="txt"><b>'+t('setBio')+'</b><small>'+
+      (bio==='enabled'?t('setBioOn'):(bio==='ready'?t('setBioOff'):t('setBioNA')))+'</small></div></button>';
+  }
   c.innerHTML=
-    (needBackup()?'<div class="warn-box">'+ic('alert')+'<span><b>خد نسخة احتياطية!</b> عندك بيانات ومعملتش تصدير من أكتر من شهر (أو خالص). لو الموبايل ضاع أو المتصفح اتمسح، النسخة دي هي اللي هترجّعلك كل حاجة.</span></div>':'')+
+    (needBackup()?'<div class="warn-box">'+ic('alert')+'<span>'+t('bkBanner')+'</span></div>':'')+
     '<div class="set-group">'+
-      '<div class="set-item">'+ic('clock')+'<div class="txt"><b>القفل التلقائي</b><small>يقفل لوحده بعد فترة خمول</small></div>'+
-        '<select id="set-autolock">'+[1,3,5,10].map(m=>'<option value="'+m+'"'+(s.autolockMin===m?' selected':'')+'>'+m+' دقايق</option>').join('')+'</select></div>'+
-      '<button class="set-item" data-act="chpw">'+ic('key')+'<div class="txt"><b>غيّر كلمة السر الرئيسية</b><small>هيعاد تشفير كل حاجة بالجديدة</small></div></button>'+
+      '<div class="set-item">'+ic('globe')+'<div class="txt"><b>'+t('setLang')+'</b><small>'+t('setLangS')+'</small></div>'+
+        '<select id="set-lang"><option value="ar"'+(lang==='ar'?' selected':'')+'>العربية</option><option value="en"'+(lang==='en'?' selected':'')+'>English</option></select></div>'+
+      '<div class="set-item">'+ic('clock')+'<div class="txt"><b>'+t('setLock')+'</b><small>'+t('setLockS')+'</small></div>'+
+        '<select id="set-autolock">'+[1,3,5,10].map(m=>'<option value="'+m+'"'+(s.autolockMin===m?' selected':'')+'>'+m+' '+t('mins')+'</option>').join('')+'</select></div>'+
+      bioRow+
+      '<button class="set-item" data-act="chpw">'+ic('key')+'<div class="txt"><b>'+t('setChpw')+'</b><small>'+t('setChpwS')+'</small></div></button>'+
     '</div>'+
     '<div class="set-group">'+
-      '<button class="set-item" data-act="export">'+ic('down')+'<div class="txt"><b>نسخة احتياطية (تصدير)</b><small>'+esc(lastEx)+' — الملف متشفّر، ينفع تحفظه في أي مكان</small></div></button>'+
-      '<button class="set-item" data-act="import">'+ic('up')+'<div class="txt"><b>استرجاع نسخة</b><small>هتستبدل كل اللي موجود دلوقتي</small></div></button>'+
+      '<button class="set-item" data-act="export">'+ic('down')+'<div class="txt"><b>'+t('setExport')+'</b><small>'+esc(lastEx)+t('setExportS2')+'</small></div></button>'+
+      '<button class="set-item" data-act="import">'+ic('up')+'<div class="txt"><b>'+t('setImport')+'</b><small>'+t('setImportS')+'</small></div></button>'+
     '</div>'+
     (window.Khazna?
     '<div class="set-group">'+
-      '<button class="set-item" data-act="checkupd">'+ic('down')+'<div class="txt"><b>'+(updAvailable?'تحديث '+esc(updAvailable)+' جاهز — دوس للتثبيت':'شيّك على تحديث')+'</b><small id="upd-status">الإصدار الحالي: '+APP_VERSION+'</small></div></button>'+
-      '<div class="set-item">'+ic('at')+'<div class="txt"><b>لينك التحديثات</b><small>الصفحة العامة اللي التطبيق بيشيّك عليها لوحده مرة كل يوم</small>'+
-      '<input id="set-updurl" class="ltr" style="margin-top:8px;font-size:.78rem;padding:9px 12px" placeholder="https://..." autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(updUrl())+'"></div></div>'+
+      '<button class="set-item" data-act="checkupd">'+ic('down')+'<div class="txt"><b>'+(updAvailable?t('setUpdAvail',{v:esc(updAvailable)}):t('setUpd'))+'</b><small id="upd-status">'+t('setUpdCur')+APP_VERSION+'</small></div></button>'+
     '</div>' : '')+
     '<div class="set-group">'+
-      '<button class="set-item danger" data-act="erase">'+ic('trash')+'<div class="txt"><b>امسح الخزنة نهائيًا</b><small>مفيش رجوع في الخطوة دي</small></div></button>'+
+      '<button class="set-item danger" data-act="erase">'+ic('trash')+'<div class="txt"><b>'+t('setErase')+'</b><small>'+t('setEraseS')+'</small></div></button>'+
     '</div>'+
-    '<div class="sec-note">🛡️ <b>إزاي محمي؟</b> كل بياناتك متشفّرة AES-256-GCM بمفتاح مشتق من كلمة سرك (PBKDF2 بـ600 ألف دورة) ومحفوظة على جهازك بس — مفيش سيرفر ولا حساب، وواجهة الخزنة معزولة عن الإنترنت تمامًا. في نسخة التطبيق، الاتصال الوحيد هو فاحص التحديثات: قراءة بس، ومفيش أي تثبيت غير لتحديث موقّع بمفتاحك انت (التطبيق ونظام أندرويد الاتنين بيرفضوا أي توقيع تاني). كلمة سرك ما بتتخزنش في أي مكان — عشان كده لو نسيتها مفيش استرجاع.</div>'+
-    '<div class="sec-note" style="text-align:center;opacity:.75">Smoyz Safe — إصدار '+APP_VERSION+'</div>';
-  $('#set-autolock').addEventListener('change',async e=>{
-    vault.settings.autolockMin=Number(e.target.value);await persist();toast('اتحفظ ✓');
+    '<div class="sec-note">'+t('secNote')+'</div>'+
+    '<div class="sec-note" style="text-align:center;opacity:.75">'+t('verLine')+APP_VERSION+'</div>';
+  $('#set-lang').addEventListener('change',e=>{
+    lang=e.target.value;localStorage.setItem(LS_LANG,lang);
+    applyLangStatic();renderTabs();renderTab();reminderSync();
   });
-  const uu=$('#set-updurl');
-  if(uu)uu.addEventListener('change',async e=>{
-    vault.settings.updateUrl=e.target.value.trim();
-    await persist();toast('اتحفظ ✓');
+  $('#set-autolock').addEventListener('change',async e=>{
+    vault.settings.autolockMin=Number(e.target.value);await persist();toast(t('saved'));
   });
 }
 
@@ -939,7 +1238,7 @@ function closeSheet(){
 $('#sheet-x').addEventListener('click',closeSheet);
 $('#sheet-bk').addEventListener('click',closeSheet);
 
-function peekBtn(id){return '<button type="button" class="peek" data-peek="'+id+'" aria-label="إظهار">'+ic('eye')+'</button>'}
+function peekBtn(id){return '<button type="button" class="peek" data-peek="'+id+'">'+ic('eye')+'</button>'}
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-peek]');if(!b)return;
   const inp=document.getElementById(b.dataset.peek);if(!inp)return;
@@ -951,29 +1250,29 @@ document.addEventListener('click',e=>{
 /* -------- فورم الباسورد -------- */
 function openPwForm(id){
   const p=id? vault.passwords.find(x=>x.id===id) : null;
-  openSheet(p?'تعديل باسورد':'باسورد جديد',
-    '<label for="f-title">الخدمة</label><input id="f-title" placeholder="جوجل، فيسبوك، انستجرام..." value="'+esc(p?.title)+'" autocomplete="off">'+
-    '<label for="f-email">الإيميل / اسم المستخدم</label><input id="f-email" class="ltr" placeholder="you@example.com" value="'+esc(p?.email)+'" autocomplete="off" autocapitalize="off" spellcheck="false">'+
-    '<label for="f-pass">الباسورد</label>'+
+  openSheet(p?t('pwEdit'):t('pwNew'),
+    '<label for="f-title">'+t('fService')+'</label><input id="f-title" placeholder="'+esc(t('fServicePh'))+'" value="'+esc(p?.title)+'" autocomplete="off">'+
+    '<label for="f-email">'+t('fEmail')+'</label><input id="f-email" class="ltr" placeholder="you@example.com" value="'+esc(p?.email)+'" autocomplete="off" autocapitalize="off" spellcheck="false">'+
+    '<label for="f-pass">'+t('fPass')+'</label>'+
     '<div class="field"><input id="f-pass" type="password" class="ltr mono" value="'+esc(p?.password)+'" autocomplete="off" autocapitalize="off" spellcheck="false">'+peekBtn('f-pass')+'</div>'+
     '<div class="meter"><i id="f-meter"></i></div><div class="meter-lbl" id="f-meter-lbl"></div>'+
-    '<details class="gen"><summary>'+ic('dice')+' ولّدلي باسورد قوي</summary><div class="gen-body">'+
-      '<div class="gen-row"><span>الطول</span><input type="range" id="g-len" min="8" max="32" value="16"><b id="g-len-v" class="num">16</b></div>'+
-      '<div class="gen-row"><input type="checkbox" id="g-up" checked><label for="g-up">حروف كبيرة A-Z</label></div>'+
-      '<div class="gen-row"><input type="checkbox" id="g-dig" checked><label for="g-dig">أرقام 0-9</label></div>'+
-      '<div class="gen-row"><input type="checkbox" id="g-sym" checked><label for="g-sym">رموز !@#$</label></div>'+
-      '<button type="button" class="btn btn-ghost" id="g-go" style="padding:10px">'+ic('dice')+' توليد</button>'+
+    '<details class="gen"><summary>'+ic('dice')+' '+t('genTitle')+'</summary><div class="gen-body">'+
+      '<div class="gen-row"><span>'+t('genLen')+'</span><input type="range" id="g-len" min="8" max="32" value="16"><b id="g-len-v" class="num">16</b></div>'+
+      '<div class="gen-row"><input type="checkbox" id="g-up" checked><label for="g-up">'+t('genUpper')+'</label></div>'+
+      '<div class="gen-row"><input type="checkbox" id="g-dig" checked><label for="g-dig">'+t('genDigits')+'</label></div>'+
+      '<div class="gen-row"><input type="checkbox" id="g-sym" checked><label for="g-sym">'+t('genSym')+'</label></div>'+
+      '<button type="button" class="btn btn-ghost" id="g-go" style="padding:10px">'+ic('dice')+' '+t('genGo')+'</button>'+
     '</div></details>'+
-    '<label for="f-url">اللينك (اختياري)</label><input id="f-url" class="ltr" placeholder="https://..." value="'+esc(p?.url)+'" autocomplete="off" autocapitalize="off">'+
-    '<label for="f-notes">ملاحظات (اختياري)</label><textarea id="f-notes" rows="2">'+esc(p?.notes)+'</textarea>'+
-    '<button class="btn btn-flame" id="f-save">'+(p?'احفظ التعديل':'احفظ')+'</button>'+
-    (p?'<button class="btn btn-danger sheet-del" id="f-del">'+ic('trash')+' امسح الباسورد ده</button>':'')
+    '<label for="f-url">'+t('fUrl')+'</label><input id="f-url" class="ltr" placeholder="https://..." value="'+esc(p?.url)+'" autocomplete="off" autocapitalize="off">'+
+    '<label for="f-notes">'+t('fNotes')+'</label><textarea id="f-notes" rows="2">'+esc(p?.notes)+'</textarea>'+
+    '<button class="btn btn-flame" id="f-save">'+(p?t('saveEdit'):t('save'))+'</button>'+
+    (p?'<button class="btn btn-danger sheet-del" id="f-del">'+ic('trash')+' '+t('delPwBtn')+'</button>':'')
   );
   const passInp=$('#f-pass');
   const updMeter=()=>{
     const s=strength(passInp.value);
     $('#f-meter').style.width=s.pct+'%';$('#f-meter').style.background=s.color;
-    $('#f-meter-lbl').textContent=passInp.value?'القوة: '+s.label:'';
+    $('#f-meter-lbl').textContent=passInp.value?t('strength')+s.label:'';
   };
   passInp.addEventListener('input',updMeter);updMeter();
   $('#g-len').addEventListener('input',e=>$('#g-len-v').textContent=e.target.value);
@@ -984,37 +1283,37 @@ function openPwForm(id){
   });
   $('#f-save').addEventListener('click',async()=>{
     const title=$('#f-title').value.trim();
-    if(!title){toast('اكتب اسم الخدمة الأول');return}
-    if(!passInp.value){toast('اكتب الباسورد');return}
+    if(!title){toast(t('needService'));return}
+    if(!passInp.value){toast(t('needPass'));return}
     const data={title,email:$('#f-email').value.trim(),password:passInp.value,url:$('#f-url').value.trim(),notes:$('#f-notes').value.trim()};
     if(p)Object.assign(p,data,{updatedAt:Date.now()});
     else vault.passwords.push({id:uid(),createdAt:Date.now(),updatedAt:Date.now(),...data});
-    await persist();closeSheet();renderTab();renderTabs();toast('اتحفظ ✓');
+    await persist();closeSheet();renderTab();renderTabs();toast(t('saved'));
   });
   if(p)$('#f-del').addEventListener('click',async()=>{
-    const yes=await confirmDlg('مسح "'+p.title+'"؟','مش هتقدر ترجّعه تاني.',{danger:true,yesLabel:'امسح'});
+    const yes=await confirmDlg(t('delPwT',{x:p.title}),t('delMsg'),{danger:true,yesLabel:t('delBtn')});
     if(!yes)return;
     vault.passwords=vault.passwords.filter(x=>x.id!==p.id);
-    await persist();closeSheet();renderTab();toast('اتمسح');
+    await persist();closeSheet();renderTab();toast(t('deleted'));
   });
 }
 
 /* -------- فورم الكارت -------- */
 function openCardForm(id){
   const cd=id? vault.cards.find(x=>x.id===id) : null;
-  openSheet(cd?'تعديل كارت':'كارت جديد',
-    '<label for="c-name">اسم الكارت</label><input id="c-name" placeholder="فيزا CIB، ماستر البنك الأهلي..." value="'+esc(cd?.name)+'" autocomplete="off">'+
-    '<label for="c-num">رقم الكارت</label>'+
+  openSheet(cd?t('cardEdit'):t('cardNew'),
+    '<label for="c-name">'+t('cName')+'</label><input id="c-name" placeholder="'+esc(t('cNamePh'))+'" value="'+esc(cd?.name)+'" autocomplete="off">'+
+    '<label for="c-num">'+t('cNum')+'</label>'+
     '<div class="field"><input id="c-num" type="password" inputmode="numeric" class="ltr mono num" value="'+esc(cd?.number)+'" autocomplete="off" maxlength="23" placeholder="0000 0000 0000 0000">'+peekBtn('c-num')+'</div>'+
     '<div class="f-row">'+
-      '<div><label for="c-exp">تاريخ الانتهاء</label><input id="c-exp" class="ltr num" inputmode="numeric" placeholder="MM/YY" maxlength="5" value="'+esc(cd?.expiry)+'" autocomplete="off"></div>'+
-      '<div><label for="c-cvv">CVV</label><div class="field"><input id="c-cvv" type="password" class="ltr num" inputmode="numeric" maxlength="4" value="'+esc(cd?.cvv)+'" autocomplete="off">'+peekBtn('c-cvv')+'</div></div>'+
+      '<div><label for="c-exp">'+t('cExp')+'</label><input id="c-exp" class="ltr num" inputmode="numeric" placeholder="MM/YY" maxlength="5" value="'+esc(cd?.expiry)+'" autocomplete="off"></div>'+
+      '<div><label for="c-cvv">'+t('cCvv')+'</label><div class="field"><input id="c-cvv" type="password" class="ltr num" inputmode="numeric" maxlength="4" value="'+esc(cd?.cvv)+'" autocomplete="off">'+peekBtn('c-cvv')+'</div></div>'+
     '</div>'+
-    '<label for="c-holder">اسم صاحب الكارت</label><input id="c-holder" class="ltr" placeholder="ZIAD ..." value="'+esc(cd?.holder)+'" autocomplete="off" autocapitalize="characters">'+
-    '<label for="c-notes">ملاحظات (اختياري — PIN مثلًا)</label><textarea id="c-notes" rows="2">'+esc(cd?.notes)+'</textarea>'+
-    (cd?'<div class="reveal-line"><span class="lbl">الرقم كامل</span><span class="val mono num ltr">'+esc(groupNum(cd.number))+'</span><button class="icon-btn" data-act="copy-num" data-id="'+cd.id+'">'+ic('copy')+'</button></div>':'')+
-    '<button class="btn btn-flame" id="c-save">'+(cd?'احفظ التعديل':'احفظ')+'</button>'+
-    (cd?'<button class="btn btn-danger sheet-del" id="c-del">'+ic('trash')+' امسح الكارت ده</button>':'')
+    '<label for="c-holder">'+t('cHolder')+'</label><input id="c-holder" class="ltr" placeholder="ZIAD ..." value="'+esc(cd?.holder)+'" autocomplete="off" autocapitalize="characters">'+
+    '<label for="c-notes">'+t('cNotes')+'</label><textarea id="c-notes" rows="2">'+esc(cd?.notes)+'</textarea>'+
+    (cd?'<div class="reveal-line"><span class="lbl">'+t('cFull')+'</span><span class="val mono num ltr">'+esc(groupNum(cd.number))+'</span><button class="icon-btn" data-act="copy-num" data-id="'+cd.id+'">'+ic('copy')+'</button></div>':'')+
+    '<button class="btn btn-flame" id="c-save">'+(cd?t('saveEdit'):t('save'))+'</button>'+
+    (cd?'<button class="btn btn-danger sheet-del" id="c-del">'+ic('trash')+' '+t('delCardBtn')+'</button>':'')
   );
   $('#c-num').addEventListener('input',e=>{
     const el=e.target;
@@ -1029,39 +1328,60 @@ function openCardForm(id){
   $('#c-save').addEventListener('click',async()=>{
     const name=$('#c-name').value.trim();
     const number=$('#c-num').value.replace(/\D/g,'');
-    if(!name){toast('اكتب اسم الكارت الأول');return}
-    if(number.length<12){toast('رقم الكارت مش مكتمل');return}
+    if(!name){toast(t('needCName'));return}
+    if(number.length<12){toast(t('needCNum'));return}
     const data={name,number,expiry:$('#c-exp').value.trim(),cvv:$('#c-cvv').value.trim(),holder:$('#c-holder').value.trim(),notes:$('#c-notes').value.trim()};
     if(cd)Object.assign(cd,data,{updatedAt:Date.now()});
     else vault.cards.push({id:uid(),createdAt:Date.now(),...data});
-    await persist();closeSheet();renderTab();renderTabs();toast('اتحفظ ✓');
+    await persist();closeSheet();renderTab();renderTabs();toast(t('saved'));
   });
   if(cd)$('#c-del').addEventListener('click',async()=>{
-    const yes=await confirmDlg('مسح "'+cd.name+'"؟','مش هتقدر ترجّعه تاني.',{danger:true,yesLabel:'امسح'});
+    const yes=await confirmDlg(t('delPwT',{x:cd.name}),t('delMsg'),{danger:true,yesLabel:t('delBtn')});
     if(!yes)return;
     vault.cards=vault.cards.filter(x=>x.id!==cd.id);
-    await persist();closeSheet();renderTab();toast('اتمسح');
+    await persist();closeSheet();renderTab();toast(t('deleted'));
   });
 }
 
-/* -------- فورم الفلوس -------- */
-function openMoneyForm(id){
+/* -------- الفلوس: اختيار النوع -------- */
+function openMoneyPicker(){
+  openSheet(t('pickType'),
+    '<div class="type-pick">'+
+      '<button data-mtype="debt"><span class="row-ic">'+ic('cash')+'</span><span><b>'+t('typeDebt')+'</b><small>'+t('typeDebtS')+'</small></span></button>'+
+      '<button data-mtype="installment"><span class="row-ic cy">'+ic('cal')+'</span><span><b>'+t('typeInst')+'</b><small>'+t('typeInstS')+'</small></span></button>'+
+      '<button data-mtype="gamiya"><span class="row-ic vi">'+ic('users')+'</span><span><b>'+t('typeGam')+'</b><small>'+t('typeGamS')+'</small></span></button>'+
+    '</div>'
+  );
+  $('#sheet-body').querySelectorAll('[data-mtype]').forEach(b=>b.addEventListener('click',()=>{
+    const k=b.dataset.mtype;
+    if(k==='debt')openDebtForm();
+    else openInstForm(null,k);
+  }));
+}
+function openMoneyEdit(id){
+  const m=vault.money.find(x=>x.id===id);if(!m)return;
+  if(m.kind==='debt')openDebtForm(id);
+  else openInstForm(id,m.kind);
+}
+
+/* -------- فورم الدين -------- */
+function openDebtForm(id){
   const m=id? vault.money.find(x=>x.id===id) : null;
   let dir=m?m.dir:'lya';
-  openSheet(m?'تعديل مبلغ':'مبلغ جديد',
+  openSheet(m?t('debtEdit'):t('debtNew'),
     '<div class="seg" id="m-seg">'+
-      '<button type="button" data-dir="lya">ليّا (يرجعلي) 💰</button>'+
-      '<button type="button" data-dir="alya">عليّا (أرجّعه)</button>'+
+      '<button type="button" data-dir="lya">'+t('mFor')+'</button>'+
+      '<button type="button" data-dir="alya">'+t('mOn')+'</button>'+
     '</div>'+
-    '<label for="m-person">مين؟</label><input id="m-person" placeholder="اسم الشخص أو الجهة" value="'+esc(m?.person)+'" autocomplete="off">'+
+    '<label for="m-person">'+t('mWho')+'</label><input id="m-person" placeholder="'+esc(t('mWhoPh'))+'" value="'+esc(m?.person)+'" autocomplete="off">'+
     '<div class="f-row">'+
-      '<div><label for="m-amount">المبلغ</label><input id="m-amount" type="number" inputmode="decimal" step="any" min="0" class="ltr num" value="'+esc(m?.amount)+'" autocomplete="off"></div>'+
-      '<div><label for="m-cur">العملة</label><input id="m-cur" value="'+esc(m?m.currency:'ج.م')+'" autocomplete="off"></div>'+
+      '<div><label for="m-amount">'+t('mAmount')+'</label><input id="m-amount" type="number" inputmode="decimal" step="any" min="0" class="ltr num" value="'+esc(m?.amount)+'" autocomplete="off"></div>'+
+      '<div><label for="m-cur">'+t('mCur')+'</label><input id="m-cur" value="'+esc(m?m.currency:defCur())+'" autocomplete="off"></div>'+
     '</div>'+
-    '<label for="m-date">التاريخ</label><input id="m-date" type="date" class="ltr num" value="'+esc(m?m.date:todayISO())+'">'+
-    '<label for="m-note">ملاحظة (اختياري)</label><input id="m-note" placeholder="سلفة، حساب شغل، قسط..." value="'+esc(m?.note)+'" autocomplete="off">'+
-    '<button class="btn btn-flame" id="m-save">'+(m?'احفظ التعديل':'احفظ')+'</button>'+
-    (m?'<button class="btn btn-danger sheet-del" id="m-del">'+ic('trash')+' امسح المبلغ ده</button>':'')
+    '<label for="m-date">'+t('mDate')+'</label><input id="m-date" type="date" class="ltr num" value="'+esc(m?m.date:todayISO())+'">'+
+    '<label for="m-note">'+t('mNote')+'</label><input id="m-note" placeholder="'+esc(t('mNotePh'))+'" value="'+esc(m?.note)+'" autocomplete="off">'+
+    '<button class="btn btn-flame" id="m-save">'+(m?t('saveEdit'):t('save'))+'</button>'+
+    (m?'<button class="btn btn-danger sheet-del" id="m-del">'+ic('trash')+' '+t('delItemBtn')+'</button>':'')
   );
   const seg=$('#m-seg');
   const paintSeg=()=>{
@@ -1075,18 +1395,74 @@ function openMoneyForm(id){
   $('#m-save').addEventListener('click',async()=>{
     const person=$('#m-person').value.trim();
     const amount=Number($('#m-amount').value);
-    if(!person){toast('اكتب اسم الشخص الأول');return}
-    if(!amount||amount<=0){toast('اكتب المبلغ');return}
-    const data={person,amount,dir,currency:$('#m-cur').value.trim()||'ج.م',date:$('#m-date').value,note:$('#m-note').value.trim()};
+    if(!person){toast(t('needWho'));return}
+    if(!amount||amount<=0){toast(t('needAmount'));return}
+    const data={kind:'debt',person,amount,dir,currency:$('#m-cur').value.trim()||defCur(),date:$('#m-date').value,note:$('#m-note').value.trim()};
     if(m)Object.assign(m,data);
     else vault.money.push({id:uid(),settled:false,createdAt:Date.now(),...data});
-    await persist();closeSheet();renderTab();renderTabs();toast('اتحفظ ✓');
+    await persist();closeSheet();renderTab();renderTabs();reminderSync();toast(t('saved'));
   });
   if(m)$('#m-del').addEventListener('click',async()=>{
-    const yes=await confirmDlg('مسح مبلغ "'+m.person+'"؟','مش هتقدر ترجّعه تاني.',{danger:true,yesLabel:'امسح'});
+    const yes=await confirmDlg(t('delPwT',{x:m.person}),t('delMsg'),{danger:true,yesLabel:t('delBtn')});
     if(!yes)return;
     vault.money=vault.money.filter(x=>x.id!==m.id);
-    await persist();closeSheet();renderTab();toast('اتمسح');
+    await persist();closeSheet();renderTab();renderTabs();reminderSync();toast(t('deleted'));
+  });
+}
+
+/* -------- فورم القسط / الجمعية -------- */
+function openInstForm(id,kind){
+  const m=id? vault.money.find(x=>x.id===id) : null;
+  const isGam=kind==='gamiya';
+  const title=m? (isGam?t('gamEdit'):t('instEdit')) : (isGam?t('gamNew'):t('instNew'));
+  openSheet(title,
+    '<label for="i-title">'+(isGam?t('gTitle'):t('iTitle'))+'</label>'+
+    '<input id="i-title" placeholder="'+esc(isGam?t('gTitlePh'):t('iTitlePh'))+'" value="'+esc(m?.title)+'" autocomplete="off">'+
+    (isGam?'':'<label for="i-funder">'+t('iFunder')+'</label><input id="i-funder" placeholder="'+esc(t('iFunderPh'))+'" value="'+esc(m?.funder)+'" autocomplete="off">')+
+    '<div class="f-row">'+
+      '<div><label for="i-monthly">'+(isGam?t('gMonthly'):t('iMonthly'))+'</label><input id="i-monthly" type="number" inputmode="decimal" step="any" min="0" class="ltr num" value="'+esc(m?.monthly)+'" autocomplete="off"></div>'+
+      '<div><label for="i-cur">'+t('mCur')+'</label><input id="i-cur" value="'+esc(m?m.currency:defCur())+'" autocomplete="off"></div>'+
+    '</div>'+
+    '<div class="f-row">'+
+      '<div><label for="i-months">'+t('iMonths')+'</label><input id="i-months" type="number" inputmode="numeric" min="1" max="240" class="ltr num" value="'+esc(m?.monthsTotal)+'" autocomplete="off"></div>'+
+      '<div><label for="i-due">'+t('iDueDay')+'</label><input id="i-due" type="number" inputmode="numeric" min="1" max="31" class="ltr num" value="'+esc(m?m.dueDay:1)+'" autocomplete="off"></div>'+
+    '</div>'+
+    '<div class="f-row">'+
+      (isGam?'<div><label for="i-turn">'+t('gTurn')+'</label><input id="i-turn" type="number" inputmode="numeric" min="1" max="240" class="ltr num" value="'+esc(m?.myTurn)+'" autocomplete="off"></div>':'')+
+      '<div><label for="i-paid">'+t('iPaid')+'</label><input id="i-paid" type="number" inputmode="numeric" min="0" max="240" class="ltr num" value="'+esc(m?m.monthsPaid:0)+'" autocomplete="off"></div>'+
+    '</div>'+
+    '<label for="i-note">'+t('mNote')+'</label><input id="i-note" value="'+esc(m?.note)+'" autocomplete="off">'+
+    '<button class="btn btn-flame" id="i-save">'+(m?t('saveEdit'):t('save'))+'</button>'+
+    (m?'<button class="btn btn-danger sheet-del" id="i-del">'+ic('trash')+' '+t('delItemBtn')+'</button>':'')
+  );
+  $('#i-save').addEventListener('click',async()=>{
+    const ti=$('#i-title').value.trim();
+    const monthly=Number($('#i-monthly').value);
+    const monthsTotal=Number($('#i-months').value);
+    if(!ti){toast(t('needITitle'));return}
+    if(!isGam&&!$('#i-funder').value.trim()){toast(t('needIFunder'));return}
+    if(!monthly||monthly<=0){toast(t('needMonthly'));return}
+    if(!monthsTotal||monthsTotal<1){toast(t('needMonths'));return}
+    const monthsPaid=Math.max(0,Number($('#i-paid').value)||0);
+    const data={
+      kind, title:ti,
+      funder:isGam?'':$('#i-funder').value.trim(),
+      monthly, currency:$('#i-cur').value.trim()||defCur(),
+      monthsTotal, monthsPaid,
+      dueDay:Math.min(31,Math.max(1,Number($('#i-due').value)||1)),
+      myTurn:isGam?Math.max(1,Number($('#i-turn').value)||1):null,
+      note:$('#i-note').value.trim(),
+      settled:monthsPaid>=monthsTotal
+    };
+    if(m)Object.assign(m,data);
+    else vault.money.push({id:uid(),lastPaidMonth:null,createdAt:Date.now(),...data});
+    await persist();closeSheet();renderTab();renderTabs();reminderSync();toast(t('saved'));
+  });
+  if(m)$('#i-del').addEventListener('click',async()=>{
+    const yes=await confirmDlg(t('delPwT',{x:m.title}),t('delMsg'),{danger:true,yesLabel:t('delBtn')});
+    if(!yes)return;
+    vault.money=vault.money.filter(x=>x.id!==m.id);
+    await persist();closeSheet();renderTab();renderTabs();reminderSync();toast(t('deleted'));
   });
 }
 
@@ -1097,74 +1473,125 @@ $('#content').addEventListener('click',async e=>{
   if(act==='open-pw')openPwForm(id);
   else if(act==='copy-user'){
     const p=vault.passwords.find(x=>x.id===id);
-    if(p)copyText(p.email,{label:'الإيميل اتنسخ'});
+    if(p)copyText(p.email,{label:t('copiedMail')});
   }
   else if(act==='copy-pass'){
     const p=vault.passwords.find(x=>x.id===id);
-    if(p)copyText(p.password,{sensitive:true,label:'الباسورد اتنسخ'});
+    if(p)copyText(p.password,{sensitive:true,label:t('copiedPass')});
   }
   else if(act==='open-card')openCardForm(id);
   else if(act==='copy-num'){
-    const c=vault.cards.find(x=>x.id===id);
-    if(c)copyText(c.number,{sensitive:true,label:'رقم الكارت اتنسخ'});
+    const c2=vault.cards.find(x=>x.id===id);
+    if(c2)copyText(c2.number,{sensitive:true,label:t('copiedNum')});
   }
-  else if(act==='open-money')openMoneyForm(id);
+  else if(act==='open-money')openMoneyEdit(id);
   else if(act==='settle'){
     const m=vault.money.find(x=>x.id===id);
-    if(m){m.settled=!m.settled;await persist();renderTab();toast(m.settled?'اتسوّت ✓':'رجع مفتوح')}
+    if(m){m.settled=!m.settled;await persist();renderTab();renderTabs();toast(m.settled?t('settledDone'):t('settledBack'))}
+  }
+  else if(act==='pay-month'){
+    const m=vault.money.find(x=>x.id===id);
+    if(m){
+      const mk=monthKey();
+      if(m.lastPaidMonth===mk){
+        m.monthsPaid=Math.max(0,(m.monthsPaid||0)-1);
+        m.lastPaidMonth=null;
+        m.settled=false;
+      }else{
+        m.monthsPaid=(m.monthsPaid||0)+1;
+        m.lastPaidMonth=mk;
+        if(m.monthsPaid>=m.monthsTotal){
+          m.settled=true;
+          toast(m.kind==='gamiya'?t('gamDone'):t('instDone'));
+        }else toast(t('saved'));
+      }
+      await persist();renderTab();renderTabs();reminderSync();
+    }
   }
   else if(act==='chpw')openChangePw();
   else if(act==='export')exportBackup();
   else if(act==='import')importBackup(false);
   else if(act==='erase')eraseAll();
+  else if(act==='bio')bioToggle();
   else if(act==='checkupd'){
     const u=updUrl();
-    if(!u){toast('حط لينك التحديثات في الخانة اللي تحت الأول');return}
+    if(!u){toast(t('updNoUrl'));return}
     updSilent=false;
     window.Khazna.checkUpdate(APP_VCODE,u);
   }
 });
-/* نسخ رقم الكارت من جوه الـsheet */
 $('#sheet-body').addEventListener('click',e=>{
   const b=e.target.closest('[data-act="copy-num"]');if(!b||!vault)return;
-  const c=vault.cards.find(x=>x.id===b.dataset.id);
-  if(c)copyText(c.number,{sensitive:true,label:'رقم الكارت اتنسخ'});
+  const c2=vault.cards.find(x=>x.id===b.dataset.id);
+  if(c2)copyText(c2.number,{sensitive:true,label:t('copiedNum')});
 });
+
+/* ================= البصمة: تفعيل/إيقاف ================= */
+function bioToggle(){
+  const st=bioStatus();
+  if(st==='enabled'){
+    confirmDlg(t('bioDisableT'),t('bioDisableMsg'),{danger:true,yesLabel:t('bioOff')}).then(yes=>{
+      if(yes){try{window.Khazna.biometricDisable()}catch(e){}toast(t('bioDisabled'));renderTab()}
+    });
+    return;
+  }
+  if(st!=='ready')return;
+  openSheet(t('bioEnableT'),
+    '<div class="warn-box">'+ic('finger')+'<span>'+t('bioEnableMsg')+'</span></div>'+
+    '<label for="bio-pw">'+t('chOld')+'</label>'+
+    '<div class="field"><input id="bio-pw" type="password" class="ltr" autocomplete="off">'+peekBtn('bio-pw')+'</div>'+
+    '<div class="gate-err" id="bio-err"></div>'+
+    '<button class="btn btn-flame" id="bio-go">'+t('bioEnable')+'</button>'
+  );
+  $('#bio-go').addEventListener('click',async()=>{
+    const pw=$('#bio-pw').value, err=$('#bio-err');
+    err.textContent='';
+    const btn=$('#bio-go');btn.disabled=true;btn.textContent=t('chWait');
+    try{
+      const blob=loadBlob();
+      const key=await deriveKey(pw,b64Buf(blob.kdf.salt),blob.kdf.iter);
+      await decryptVault(key,blob);
+      window.Khazna.biometricEnable(pw);
+      btn.disabled=false;btn.textContent=t('bioEnable');
+    }catch(ex){err.textContent=t('chWrong');btn.disabled=false;btn.textContent=t('bioEnable')}
+  });
+}
 
 /* ================= إعدادات: أكشنات ================= */
 function openChangePw(){
-  openSheet('تغيير كلمة السر الرئيسية',
-    '<label for="ch-old">كلمة السر الحالية</label>'+
+  openSheet(t('setChpw'),
+    '<label for="ch-old">'+t('chOld')+'</label>'+
     '<div class="field"><input id="ch-old" type="password" class="ltr" autocomplete="off">'+peekBtn('ch-old')+'</div>'+
-    '<label for="ch-new">الجديدة</label>'+
+    '<label for="ch-new">'+t('chNew')+'</label>'+
     '<div class="field"><input id="ch-new" type="password" class="ltr" autocomplete="new-password">'+peekBtn('ch-new')+'</div>'+
     '<div class="meter"><i id="ch-meter"></i></div><div class="meter-lbl" id="ch-meter-lbl"></div>'+
-    '<label for="ch-new2">تأكيد الجديدة</label>'+
+    '<label for="ch-new2">'+t('chNew2')+'</label>'+
     '<div class="field"><input id="ch-new2" type="password" class="ltr" autocomplete="new-password">'+peekBtn('ch-new2')+'</div>'+
     '<div class="gate-err" id="ch-err"></div>'+
-    '<button class="btn btn-flame" id="ch-go">غيّر كلمة السر</button>'
+    '<button class="btn btn-flame" id="ch-go">'+t('chGo')+'</button>'
   );
   $('#ch-new').addEventListener('input',e=>{
     const s=strength(e.target.value);
     $('#ch-meter').style.width=s.pct+'%';$('#ch-meter').style.background=s.color;
-    $('#ch-meter-lbl').textContent=e.target.value?'القوة: '+s.label:'';
+    $('#ch-meter-lbl').textContent=e.target.value?t('strength')+s.label:'';
   });
   $('#ch-go').addEventListener('click',async()=>{
     const err=$('#ch-err');err.textContent='';
     const old=$('#ch-old').value,nw=$('#ch-new').value,nw2=$('#ch-new2').value;
-    if(nw.length<8){err.textContent='الجديدة لازم 8 أحرف على الأقل';return}
-    if(nw!==nw2){err.textContent='الجديدة وتأكيدها مش زي بعض';return}
-    const btn=$('#ch-go');btn.disabled=true;btn.textContent='ثواني...';
+    if(nw.length<8){err.textContent=t('chShort');return}
+    if(nw!==nw2){err.textContent=t('chMismatch');return}
+    const btn=$('#ch-go');btn.disabled=true;btn.textContent=t('chWait');
     try{
       const blob=loadBlob();
       const oldKey=await deriveKey(old,b64Buf(blob.kdf.salt),blob.kdf.iter);
-      await decryptVault(oldKey,blob); // تأكيد إن القديمة صح
+      await decryptVault(oldKey,blob);
       const salt=crypto.getRandomValues(new Uint8Array(16));
       const kdf={alg:'PBKDF2-SHA256',iter:KDF_ITER,salt:bufB64(salt)};
       cryptoKey=await deriveKey(nw,salt,KDF_ITER);
       saveBlob(await encryptVault(cryptoKey,vault,kdf));
-      closeSheet();toast('اتغيّرت ✓ متنساش الجديدة!');
-    }catch(ex){err.textContent='كلمة السر الحالية مش صح';btn.disabled=false;btn.textContent='غيّر كلمة السر'}
+      if(bioStatus()==='enabled'){try{window.Khazna.biometricEnable(nw)}catch(e){}}
+      closeSheet();toast(t('chDone'));
+    }catch(ex){err.textContent=t('chWrong');btn.disabled=false;btn.textContent=t('chGo')}
   });
 }
 
@@ -1174,12 +1601,12 @@ async function exportBackup(){
   const payload=JSON.stringify(blob);
   const markDone=async()=>{
     if(vault){vault.settings.lastExport=Date.now();await persist();renderTab();renderTabs()}
-    toast('اتصدّرت ✓ — الملف متشفّر ومحتاج كلمة سرك');
+    toast(t('exported'));
   };
-  if(window.Khazna&&window.Khazna.exportBackup){ // جوه تطبيق الأندرويد: نافذة الحفظ الأصلية
+  if(window.Khazna&&window.Khazna.exportBackup){
     window.__khaznaExportDone=async ok=>{
       window.__khaznaExportDone=null;
-      if(ok)await markDone();else toast('التصدير اتلغى');
+      if(ok)await markDone();else toast(t('exportCancel'));
     };
     window.Khazna.exportBackup(payload,name);
     return;
@@ -1196,17 +1623,17 @@ async function applyImportedBackup(txt,fromSetup){
   try{
     const blob=JSON.parse(txt);
     if(!(blob&&blob.v===1&&blob.kdf&&blob.kdf.salt&&blob.kdf.iter&&blob.cipher&&blob.cipher.iv&&blob.cipher.data))
-      throw new Error('صيغة الملف مش مفهومة');
+      throw new Error('bad format');
     if(!fromSetup&&loadBlob()){
-      const yes=await confirmDlg('استرجاع نسخة احتياطية','دي هتستبدل كل اللي في الخزنة دلوقتي بمحتوى النسخة. متأكد؟',{danger:true,yesLabel:'استبدل'});
+      const yes=await confirmDlg(t('importT'),t('importMsg'),{danger:true,yesLabel:t('importBtn')});
       if(!yes)return;
     }
     saveBlob(blob);saveGuard({n:0,until:0});
     location.reload();
-  }catch(ex){toast('الملف ده مش نسخة خزنة صالحة')}
+  }catch(ex){toast(t('importBad'))}
 }
 function importBackup(fromSetup){
-  if(window.Khazna&&window.Khazna.importBackup){ // جوه تطبيق الأندرويد: نافذة اختيار الملفات الأصلية
+  if(window.Khazna&&window.Khazna.importBackup){
     window.__khaznaImportData=txt=>{window.__khaznaImportData=null;applyImportedBackup(txt,fromSetup)};
     window.Khazna.importBackup();
     return;
@@ -1221,10 +1648,9 @@ function importBackup(fromSetup){
 }
 
 async function eraseAll(){
-  const yes=await confirmDlg('مسح الخزنة نهائيًا',
-    'كل الباسوردات والكروت والمبالغ هتتمسح من الجهاز ده ومفيش أي رجوع. لو متأكد اكتب "امسح" تحت.',
-    {danger:true,requireText:'امسح',yesLabel:'امسح كل حاجة'});
+  const yes=await confirmDlg(t('eraseT'),t('eraseMsg'),{danger:true,requireText:t('eraseWord'),yesLabel:t('eraseAllBtn')});
   if(!yes)return;
+  try{if(window.Khazna&&window.Khazna.biometricDisable)window.Khazna.biometricDisable()}catch(e){}
   localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_GUARD);
   location.reload();
 }
