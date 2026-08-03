@@ -1,0 +1,1225 @@
+<meta charset="utf-8">
+<style>
+/* ===== الخزنة — Vancore Vault ===== */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  /* هوية Smoyz — نيون على أسود بنفسجي (من smoyz-hr/css/tokens.css) */
+  --bg:#0A0711;
+  --surface:#130E1D;
+  --surface-2:#191225;
+  --panel:#221930;
+  --border-strong:#3D2F58;
+  --line:#2B2140;
+  --ink:#F0ECF7;
+  --muted:#A093B8;
+  --faint:#726389;
+  --flame:#FF5B14;
+  --flame-hi:#FF8A4D;
+  --flame-glow:rgba(255,91,20,.35);
+  --on-flame:#0A0711;
+  --cyan:#2BB8FF;
+  --violet:#A62BFF;
+  --ok:#45D95B;
+  --amber:#F2A93B;
+  --danger:#FF5B58;
+  --r-lg:16px; --r-md:12px; --r-sm:8px;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"Roboto Mono",monospace;
+  --z-fab:10; --z-nav:20; --z-sheet-bk:30; --z-sheet:31; --z-confirm-bk:40; --z-confirm:41; --z-toast:50;
+}
+html{font-size:16px}
+body{
+  background:var(--bg);
+  background-image:radial-gradient(120% 55% at 50% -10%, rgba(166,43,255,.16), transparent 70%);
+  background-repeat:no-repeat;
+  color:var(--ink);
+  font-family:"Dubai","Cairo","Segoe UI",system-ui,Roboto,"Noto Sans Arabic",Tahoma,sans-serif;
+  min-height:100dvh;
+  overscroll-behavior-y:none;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;touch-action:manipulation}
+input,select,textarea{
+  font:inherit;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--r-md);
+  padding:12px 14px;width:100%;font-size:16px;outline:none;
+}
+input::placeholder,textarea::placeholder{color:var(--faint)}
+input:focus,select:focus,textarea:focus{border-color:var(--flame);box-shadow:0 0 0 3px rgba(255,91,20,.12)}
+:focus-visible{outline:2px solid var(--flame);outline-offset:2px}
+::selection{background:var(--border-strong);color:var(--ink)}
+svg{width:22px;height:22px;flex:none}
+.ltr{direction:ltr;unicode-bidi:embed;text-align:left}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono)}
+
+/* ---- app frame ---- */
+#app{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;position:relative}
+.screen{flex:1;display:none;flex-direction:column}
+.screen.on{display:flex}
+
+/* ---- gate screens (setup / lock) ---- */
+.gate{align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:0}
+.gate-mark{
+  width:88px;height:88px;border-radius:50%;
+  background:var(--panel);border:1px solid var(--border-strong);
+  box-shadow:0 0 28px rgba(255,91,20,.18);
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+}
+.gate-mark svg{width:40px;height:40px;color:var(--flame)}
+.gate h1{font-size:1.75rem;font-weight:800;letter-spacing:-.01em}
+.gate .brand{
+  font-size:.66rem;font-weight:600;letter-spacing:.34em;color:var(--faint);
+  margin-top:6px;margin-bottom:30px;direction:ltr;
+}
+.gate form{width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;text-align:right}
+.gate label{font-size:.85rem;color:var(--muted)}
+.field{position:relative}
+.field input{padding-inline-end:46px}
+.field .peek{
+  position:absolute;top:0;inset-inline-end:0;height:100%;width:46px;
+  display:flex;align-items:center;justify-content:center;color:var(--faint);
+}
+.field .peek:active{color:var(--ink)}
+.btn{
+  border-radius:var(--r-md);padding:13px 18px;font-weight:700;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:filter .15s, transform .1s;
+}
+.btn:active{transform:scale(.985)}
+.btn-flame{background:var(--flame);color:var(--on-flame)}
+.btn-flame:hover{background:var(--flame-hi)}
+.btn-flame:disabled{filter:saturate(.35) brightness(.75);cursor:default}
+.btn-ghost{background:var(--surface-2);border:1px solid var(--line)}
+.btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+.warn-box{
+  display:flex;gap:10px;align-items:flex-start;text-align:right;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:12px 14px;font-size:.85rem;color:var(--muted);line-height:1.65;
+}
+.warn-box svg{color:var(--amber);width:19px;height:19px;margin-top:2px}
+.gate .aux{margin-top:22px;font-size:.85rem;color:var(--cyan);text-decoration:underline;text-underline-offset:3px}
+.gate-err{color:var(--danger);font-size:.85rem;min-height:1.2em}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(6px)}40%,80%{transform:translateX(-6px)}}
+
+/* strength meter */
+.meter{height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:2px;background:var(--danger);transition:width .25s,background .25s}
+.meter-lbl{font-size:.75rem;color:var(--faint);min-height:1em}
+
+/* ---- main ---- */
+#scr-main{padding-bottom:76px}
+header.bar{
+  position:sticky;top:0;z-index:var(--z-nav);
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+  padding:14px 18px;display:flex;align-items:center;gap:12px;
+}
+.bar-mark{width:34px;height:34px;border-radius:10px;background:rgba(255,91,20,.12);color:var(--flame);
+  display:flex;align-items:center;justify-content:center}
+.bar-mark svg{width:19px;height:19px}
+.bar-t{flex:1;line-height:1.15}
+.bar-t b{font-size:1.06rem;font-weight:800;display:block}
+.bar-t span{font-size:.6rem;letter-spacing:.3em;color:var(--faint);direction:ltr;display:block}
+.bar-lock{width:42px;height:42px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--ink);background:rgba(255,255,255,.07)}
+.bar-lock:active{background:rgba(255,255,255,.14)}
+
+main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap:10px}
+
+/* rows */
+.row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:12px 14px;cursor:pointer;
+}
+.row:active{background:var(--surface-2)}
+.row-ic{
+  width:40px;height:40px;border-radius:12px;background:var(--panel);
+  display:flex;align-items:center;justify-content:center;color:var(--flame);flex:none;
+}
+.row-ic.cy{color:var(--cyan)}
+.row-ic svg{width:19px;height:19px}
+.row-main{flex:1;min-width:0}
+.row-t{font-weight:700;font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-s{font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.row-acts{display:flex;gap:4px;flex:none}
+.icon-btn{
+  width:40px;height:40px;border-radius:var(--r-md);
+  display:flex;align-items:center;justify-content:center;color:var(--muted);
+}
+.icon-btn:active{background:var(--surface-2);color:var(--ink)}
+.icon-btn svg{width:19px;height:19px}
+
+/* chips */
+.chip{
+  display:inline-flex;align-items:center;padding:3px 9px;border-radius:var(--r-sm);
+  font-size:.7rem;font-weight:700;background:var(--panel);border:1px solid var(--border-strong);color:var(--ink);
+  letter-spacing:.04em;direction:ltr;
+}
+.chip.meeza{letter-spacing:0}
+
+/* search */
+.search{position:relative}
+.search svg{position:absolute;inset-inline-start:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--faint);pointer-events:none}
+.search input{padding-inline-start:44px;border-radius:var(--r-lg);background:var(--surface)}
+
+/* money summary */
+.mny-sum{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;justify-content:space-between;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:13px 16px;font-size:.92rem;
+}
+.mny-sum .pos{color:var(--ok);font-weight:800}
+.mny-sum .neg{color:var(--amber);font-weight:800}
+.mny-sum small{color:var(--faint);font-weight:400;font-size:.78rem}
+.amt-pos{color:var(--ok);font-weight:800}
+.amt-neg{color:var(--amber);font-weight:800}
+.row.settled{opacity:.45}
+.row.settled .row-t{text-decoration:line-through}
+.settle-btn{border:1.5px solid var(--line);color:var(--faint)}
+.settle-btn.done{border-color:var(--ok);color:var(--ok);background:rgba(69,217,91,.10)}
+
+/* empty state */
+.empty{
+  text-align:center;color:var(--faint);padding:56px 24px;display:flex;flex-direction:column;
+  align-items:center;gap:12px;font-size:.92rem;line-height:1.7;
+}
+.empty svg{width:42px;height:42px;opacity:.4}
+
+/* bottom nav */
+nav#tabs{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;z-index:var(--z-nav);
+  background:var(--surface);border-top:1px solid var(--line);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);
+}
+nav#tabs button{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 4px 10px;color:var(--faint);font-size:.68rem;font-weight:600;position:relative;
+}
+nav#tabs button svg{width:21px;height:21px}
+nav#tabs button.on{color:var(--flame)}
+nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);width:7px;height:7px;border-radius:50%;background:var(--amber)}
+
+/* FAB */
+#fab{
+  position:fixed;bottom:calc(74px + env(safe-area-inset-bottom));z-index:var(--z-fab);
+  inset-inline-end:calc(50% - 240px + 18px);
+  width:56px;height:56px;border-radius:18px;background:var(--flame);color:var(--on-flame);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 22px var(--flame-glow);
+  transition:transform .12s;
+}
+@media (max-width:500px){#fab{inset-inline-end:18px}}
+#fab:active{transform:scale(.93)}
+#fab svg{width:25px;height:25px}
+#fab.hide{display:none}
+
+/* settings */
+.set-group{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.set-item{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;text-align:right;
+  border-bottom:1px solid var(--line);
+}
+.set-item:last-child{border-bottom:none}
+.set-item:active{background:var(--surface-2)}
+.set-item svg{width:20px;height:20px;color:var(--muted);flex:none}
+.set-item .txt{flex:1;min-width:0}
+.set-item .txt b{font-size:.94rem;font-weight:700;display:block}
+.set-item .txt small{font-size:.78rem;color:var(--faint)}
+.set-item select{width:auto;padding:8px 12px;font-size:.88rem;background:var(--surface-2)}
+.set-item.danger .txt b,.set-item.danger svg{color:var(--danger)}
+.sec-note{font-size:.8rem;color:var(--faint);line-height:1.8;padding:4px 6px}
+.sec-note b{color:var(--muted)}
+
+/* ---- bottom sheet ---- */
+#sheet-bk{
+  position:fixed;inset:0;background:rgba(5,7,8,.66);z-index:var(--z-sheet-bk);
+  opacity:0;pointer-events:none;transition:opacity .22s;
+}
+#sheet-bk.on{opacity:1;pointer-events:auto}
+#sheet{
+  position:fixed;bottom:0;left:50%;transform:translate(-50%,105%);
+  width:100%;max-width:480px;max-height:90dvh;z-index:var(--z-sheet);
+  background:var(--surface);border:1px solid var(--line);border-bottom:none;
+  border-radius:22px 22px 0 0;
+  display:flex;flex-direction:column;
+  transition:transform .28s cubic-bezier(.16,1,.3,1);
+}
+#sheet.on{transform:translate(-50%,0)}
+.sheet-h{
+  display:flex;align-items:center;gap:8px;padding:16px 18px 8px;
+}
+.sheet-h b{flex:1;font-size:1.06rem;font-weight:800}
+.sheet-body{overflow-y:auto;padding:8px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.sheet-body label{font-size:.83rem;color:var(--muted);margin-bottom:-6px}
+.f-row{display:flex;gap:10px}
+.f-row>*{flex:1}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:4px;gap:4px}
+.seg button{flex:1;padding:9px;border-radius:9px;font-weight:700;font-size:.92rem;color:var(--muted)}
+.seg button.on-pos{background:rgba(69,217,91,.14);color:var(--ok)}
+.seg button.on-neg{background:rgba(242,169,59,.14);color:var(--amber)}
+details.gen{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+details.gen summary{
+  list-style:none;cursor:pointer;padding:11px 14px;font-size:.88rem;font-weight:700;color:var(--muted);
+  display:flex;align-items:center;gap:8px;
+}
+details.gen summary::-webkit-details-marker{display:none}
+details.gen summary svg{width:17px;height:17px}
+.gen-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;font-size:.85rem}
+.gen-row{display:flex;align-items:center;gap:10px;color:var(--muted)}
+.gen-row input[type=range]{flex:1;padding:0;background:none;border:none}
+.gen-row input[type=checkbox]{width:18px;height:18px;padding:0;accent-color:var(--flame)}
+.gen-row label{margin:0;font-size:.85rem}
+.sheet-del{margin-top:4px}
+.reveal-line{
+  display:flex;align-items:center;gap:8px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--r-md);padding:11px 14px;
+}
+.reveal-line .val{flex:1;font-size:.95rem;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.reveal-line .lbl{font-size:.75rem;color:var(--faint);flex:none}
+
+/* ---- confirm dialog ---- */
+#cf-bk{position:fixed;inset:0;background:rgba(5,7,8,.72);z-index:var(--z-confirm-bk);display:none;align-items:center;justify-content:center;padding:26px}
+#cf-bk.on{display:flex}
+#cf{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  width:100%;max-width:330px;padding:20px;display:flex;flex-direction:column;gap:12px;
+}
+#cf b{font-size:1rem}
+#cf p{font-size:.87rem;color:var(--muted);line-height:1.7}
+#cf .cf-btns{display:flex;gap:10px;margin-top:4px}
+#cf .cf-btns .btn{flex:1;padding:11px;font-size:.92rem}
+
+/* ---- toast ---- */
+#toast{
+  position:fixed;bottom:calc(84px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,16px);
+  background:var(--panel);border:1px solid var(--border-strong);color:var(--ink);
+  padding:10px 18px;border-radius:99px;font-size:.88rem;font-weight:600;
+  z-index:var(--z-toast);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  max-width:88vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* entrance */
+.fade-in{animation:fadeIn .26s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+
+<div id="app">
+
+  <!-- شاشة الإنشاء الأولى -->
+  <section class="screen gate" id="scr-setup">
+    <div class="gate-mark" id="setup-mark"></div>
+    <h1>Smoyz Safe</h1>
+    <div class="brand">LET&nbsp;THE&nbsp;GAME&nbsp;BEGIN</div>
+    <form id="setup-form" autocomplete="off">
+      <label for="su-pw">اعمل كلمة سر رئيسية — دي مفتاح كل حاجة</label>
+      <div class="field">
+        <input type="password" id="su-pw" class="ltr" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="كلمة سر قوية (12+ حرف)">
+        <button type="button" class="peek" data-peek="su-pw" aria-label="إظهار كلمة السر"></button>
+      </div>
+      <div class="meter"><i id="su-meter"></i></div>
+      <div class="meter-lbl" id="su-meter-lbl"></div>
+      <div class="field">
+        <input type="password" id="su-pw2" class="ltr" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="اكتبها تاني للتأكيد">
+        <button type="button" class="peek" data-peek="su-pw2" aria-label="إظهار كلمة السر"></button>
+      </div>
+      <div class="warn-box" id="su-warn">
+        <span id="su-warn-ic"></span>
+        <span>لو نسيت كلمة السر دي <b>مفيش أي طريقة</b> لاسترجاع بياناتك — كل حاجة متشفّرة بيها وما بتتخزنش في أي مكان. احفظها كويس.</span>
+      </div>
+      <div class="gate-err" id="su-err"></div>
+      <button type="submit" class="btn btn-flame" id="su-btn">أنشئ الخزنة</button>
+    </form>
+    <button class="aux" id="su-restore">عندك نسخة احتياطية؟ استرجعها</button>
+  </section>
+
+  <!-- شاشة القفل -->
+  <section class="screen gate" id="scr-lock">
+    <div class="gate-mark" id="lock-mark"></div>
+    <h1>Smoyz Safe</h1>
+    <div class="brand">مقفول&nbsp;🔒</div>
+    <form id="lock-form" autocomplete="off">
+      <div class="field">
+        <input type="password" id="lk-pw" class="ltr" autocomplete="current-password" autocapitalize="off" spellcheck="false" placeholder="كلمة السر الرئيسية">
+        <button type="button" class="peek" data-peek="lk-pw" aria-label="إظهار كلمة السر"></button>
+      </div>
+      <div class="gate-err" id="lk-err"></div>
+      <button type="submit" class="btn btn-flame" id="lk-btn">افتح الخزنة</button>
+    </form>
+    <button class="aux" id="lk-forgot">نسيت كلمة السر؟</button>
+  </section>
+
+  <!-- الشاشة الرئيسية -->
+  <section class="screen" id="scr-main">
+    <header class="bar">
+      <div class="bar-mark" id="bar-mark"></div>
+      <div class="bar-t"><b>Smoyz Safe</b><span>SECURE&nbsp;VAULT</span></div>
+      <button class="bar-lock" id="btn-lock" aria-label="اقفل الخزنة دلوقتي"></button>
+    </header>
+    <main id="content"></main>
+    <button id="fab" aria-label="إضافة جديد"></button>
+    <nav id="tabs"></nav>
+  </section>
+
+</div>
+
+<!-- Bottom sheet -->
+<div id="sheet-bk"></div>
+<div id="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-h"><b id="sheet-title"></b><button class="icon-btn" id="sheet-x" aria-label="إغلاق"></button></div>
+  <div class="sheet-body" id="sheet-body"></div>
+</div>
+
+<!-- Confirm -->
+<div id="cf-bk">
+  <div id="cf">
+    <b id="cf-title"></b>
+    <p id="cf-msg"></p>
+    <input type="text" id="cf-input" style="display:none" autocomplete="off">
+    <div class="cf-btns">
+      <button class="btn btn-ghost" id="cf-no">إلغاء</button>
+      <button class="btn" id="cf-yes">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+<input type="file" id="file-in" accept=".json,application/json" style="display:none">
+
+<script>
+'use strict';
+/* ================= أساسيات ================= */
+document.documentElement.setAttribute('dir','rtl');
+document.documentElement.setAttribute('lang','ar-EG');
+if(!document.querySelector('meta[name=viewport]')){
+  const m=document.createElement('meta');m.name='viewport';
+  m.content='width=device-width, initial-scale=1, viewport-fit=cover';
+  document.head.appendChild(m);
+}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=> (crypto.randomUUID? crypto.randomUUID() : 'id-'+Date.now()+'-'+Math.floor(Math.random()*1e9));
+
+/* أيقونات SVG */
+const P={
+  shield:'<path d="M12 22s8-3.6 8-10V5.5L12 2 4 5.5V12c0 6.4 8 10 8 10z"/><path d="M8.8 12l2.2 2.2 4.4-4.6"/>',
+  lock:'<rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  key:'<circle cx="8" cy="16" r="4.5"/><path d="M11.2 12.8L21 3m-4.5 1.5l3 3M13.5 10.5l2.5 2.5"/>',
+  card:'<rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/>',
+  cash:'<rect x="2" y="6" width="20" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 12h.01M18 12h.01"/>',
+  sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:'<path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.5 0-10-7-10-7a18.8 18.8 0 0 1 4.1-4.9M9.9 4.2A9.6 9.6 0 0 1 12 5c6.5 0 10 7 10 7a18.8 18.8 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M2 2l20 20"/>',
+  trash:'<path d="M3.5 6h17M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6m3 0v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  down:'<path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5"/><path d="M4 17v2.5A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5V17"/>',
+  up:'<path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5"/><path d="M4 17v2.5A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5V17"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  check:'<path d="M4.5 12.5l5 5 10-11"/>',
+  dice:'<path d="M4 12a8 8 0 0 1 13.5-5.7L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.5 5.7L4 15.5"/><path d="M4 20v-4.5h4.5"/>',
+  at:'<circle cx="12" cy="12" r="4"/><path d="M16 8v5a2.5 2.5 0 0 0 5 0v-1a9 9 0 1 0-3.5 7.1"/>',
+  alert:'<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+  loader:'<path d="M12 3a9 9 0 1 0 9 9"/>'
+};
+const ic=n=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
+
+/* ================= تشفير ================= */
+const enc=new TextEncoder(), dec=new TextDecoder();
+function bufB64(buf){const u=new Uint8Array(buf);let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)}
+function b64Buf(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+const KDF_ITER=600000;
+
+async function deriveKey(password,salt,iter){
+  const km=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},
+    km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']
+  );
+}
+async function encryptVault(key,obj,kdf){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(JSON.stringify(obj)));
+  return {v:1,kdf,cipher:{alg:'AES-256-GCM',iv:bufB64(iv),data:bufB64(ct)}};
+}
+async function decryptVault(key,blob){
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64Buf(blob.cipher.iv)},key,b64Buf(blob.cipher.data));
+  return JSON.parse(dec.decode(pt));
+}
+
+/* ================= تخزين ================= */
+const APP_VERSION='1.3'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=4;       // بيتبمب تلقائيًا من release.ps1
+const DEFAULT_UPDATE_URL=''; // اللينك العام لصفحة التنزيل — بيتبيك هنا لما يتعمل
+const LS_KEY='vancore.khazna.v1';
+const LS_GUARD='vancore.khazna.guard';
+function loadBlob(){try{const b=JSON.parse(localStorage.getItem(LS_KEY));return (b&&b.v===1&&b.kdf&&b.cipher)?b:null}catch(e){return null}}
+function saveBlob(b){localStorage.setItem(LS_KEY,JSON.stringify(b))}
+function loadGuard(){try{return JSON.parse(localStorage.getItem(LS_GUARD))||{n:0,until:0}}catch(e){return{n:0,until:0}}}
+function saveGuard(g){localStorage.setItem(LS_GUARD,JSON.stringify(g))}
+
+/* ================= حالة ================= */
+let vault=null;        // البيانات المفكوكة في الذاكرة وقت الفتح بس
+let cryptoKey=null;    // مفتاح الجلسة — غير قابل للتصدير
+let currentTab='pw';
+let pwSearch='';
+let lastActivity=Date.now();
+let hiddenAt=null;
+
+const emptyVault=()=>({passwords:[],cards:[],money:[],settings:{autolockMin:3,lastExport:0}});
+
+async function persist(){
+  if(!vault||!cryptoKey) return;
+  const cur=loadBlob();
+  const blob=await encryptVault(cryptoKey,vault,cur.kdf);
+  saveBlob(blob);
+}
+
+/* ================= Toast + Confirm ================= */
+let toastT=null;
+function toast(msg){
+  const t=$('#toast');t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200);
+}
+function confirmDlg(title,msg,opts={}){
+  return new Promise(res=>{
+    $('#cf-title').textContent=title;
+    $('#cf-msg').textContent=msg;
+    const inp=$('#cf-input'), yes=$('#cf-yes'), no=$('#cf-no');
+    if(opts.requireText){
+      inp.style.display='block';inp.value='';inp.placeholder='اكتب: '+opts.requireText;
+    } else inp.style.display='none';
+    yes.className='btn '+(opts.danger?'btn-danger':'btn-flame');
+    yes.textContent=opts.yesLabel||'تأكيد';
+    $('#cf-bk').classList.add('on');
+    const done=v=>{$('#cf-bk').classList.remove('on');yes.onclick=no.onclick=null;res(v)};
+    yes.onclick=()=>{
+      if(opts.requireText && inp.value.trim()!==opts.requireText){inp.style.borderColor='var(--danger)';return}
+      done(true);
+    };
+    no.onclick=()=>done(false);
+  });
+}
+
+/* ================= نسخ للكليبورد ================= */
+let clipTimer=null;
+async function copyText(txt,{sensitive=false,label='اتنسخ'}={}){
+  let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true}
+  catch(e){
+    try{
+      const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';
+      document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove();
+    }catch(e2){}
+  }
+  if(!ok){toast('النسخ اتمنع من المتصفح');return}
+  toast(sensitive? label+' ✓ — هيتمسح من الكليبورد بعد ٤٠ ثانية' : label+' ✓');
+  if(sensitive){
+    clearTimeout(clipTimer);
+    clipTimer=setTimeout(()=>{navigator.clipboard.writeText('').catch(()=>{})},40000);
+  }
+}
+
+/* ================= قوة كلمة السر + التوليد ================= */
+function strength(pw){
+  if(!pw) return {bits:0,label:'',color:'var(--danger)',pct:0};
+  let pool=0;
+  if(/[a-z]/.test(pw))pool+=26;
+  if(/[A-Z]/.test(pw))pool+=26;
+  if(/[0-9]/.test(pw))pool+=10;
+  if(/[^a-zA-Z0-9]/.test(pw))pool+=32;
+  const bits=Math.round(pw.length*Math.log2(pool||1));
+  let label,color;
+  if(bits<45){label='ضعيفة';color='var(--danger)'}
+  else if(bits<70){label='متوسطة';color='var(--amber)'}
+  else if(bits<95){label='قوية';color='var(--ok)'}
+  else{label='ممتازة 💪';color='var(--ok)'}
+  return {bits,label,color,pct:Math.min(100,Math.round(bits/110*100))};
+}
+function randInt(max){ // بدون انحياز modulo
+  const lim=Math.floor(0x100000000/max)*max;
+  const a=new Uint32Array(1);
+  do{crypto.getRandomValues(a)}while(a[0]>=lim);
+  return a[0]%max;
+}
+function genPassword(len,useUpper,useDigits,useSymbols){
+  const lower='abcdefghijkmnopqrstuvwxyz';
+  const upper='ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const digits='23456789';
+  const symbols='!@#$%^&*-_=+?';
+  let all=lower;const must=[lower];
+  if(useUpper){all+=upper;must.push(upper)}
+  if(useDigits){all+=digits;must.push(digits)}
+  if(useSymbols){all+=symbols;must.push(symbols)}
+  const out=[];
+  must.forEach(set=>out.push(set[randInt(set.length)]));
+  while(out.length<len)out.push(all[randInt(all.length)]);
+  for(let i=out.length-1;i>0;i--){const j=randInt(i+1);[out[i],out[j]]=[out[j],out[i]]}
+  return out.slice(0,len).join('');
+}
+
+/* ================= تنسيقات ================= */
+const nfmt=new Intl.NumberFormat('en-US',{maximumFractionDigits:2});
+const fmtAmt=n=>nfmt.format(n);
+function fmtDate(iso){
+  if(!iso)return'';
+  const [y,m,d]=iso.split('-');
+  return d+'/'+m+'/'+y;
+}
+function todayISO(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function cardBrand(num){
+  const n=(num||'').replace(/\D/g,'');
+  if(/^(507803|507808|507809|9)/.test(n))return{t:'ميزة',cls:'meeza'};
+  if(/^4/.test(n))return{t:'VISA',cls:''};
+  if(/^5[1-5]/.test(n)||/^2[2-7]/.test(n))return{t:'MASTERCARD',cls:''};
+  if(/^3[47]/.test(n))return{t:'AMEX',cls:''};
+  return{t:'كارت',cls:'meeza'};
+}
+const maskNum=num=>{const n=(num||'').replace(/\D/g,'');return n? '•••• '+n.slice(-4):''};
+const groupNum=num=>(num||'').replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim();
+
+/* ================= الشاشات ================= */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  $(id).classList.add('on');
+}
+
+function boot(){
+  $('#setup-mark').innerHTML=ic('shield');
+  $('#lock-mark').innerHTML=ic('lock');
+  $('#bar-mark').innerHTML=ic('shield');
+  $('#btn-lock').innerHTML=ic('lock');
+  $('#fab').innerHTML=ic('plus');
+  $('#sheet-x').innerHTML=ic('x');
+  $('#su-warn-ic').innerHTML=ic('alert');
+  document.querySelectorAll('.peek').forEach(b=>b.innerHTML=ic('eye'));
+
+  if(loadBlob()){show('#scr-lock');setTimeout(()=>$('#lk-pw').focus(),80)}
+  else{show('#scr-setup')}
+}
+
+/* -------- الإنشاء الأول -------- */
+$('#su-pw').addEventListener('input',e=>{
+  const s=strength(e.target.value);
+  const m=$('#su-meter');m.style.width=s.pct+'%';m.style.background=s.color;
+  $('#su-meter-lbl').textContent=e.target.value? 'القوة: '+s.label:'';
+});
+$('#setup-form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const pw=$('#su-pw').value, pw2=$('#su-pw2').value, err=$('#su-err');
+  err.textContent='';
+  if(pw.length<8){err.textContent='كلمة السر لازم تكون 8 أحرف على الأقل';return}
+  if(pw!==pw2){err.textContent='الكلمتين مش زي بعض';return}
+  const btn=$('#su-btn');btn.disabled=true;btn.innerHTML='<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+P.loader+'</svg> بجهّز الخزنة...';
+  try{
+    const salt=crypto.getRandomValues(new Uint8Array(16));
+    const kdf={alg:'PBKDF2-SHA256',iter:KDF_ITER,salt:bufB64(salt)};
+    cryptoKey=await deriveKey(pw,salt,KDF_ITER);
+    vault=emptyVault();
+    saveBlob(await encryptVault(cryptoKey,vault,kdf));
+    saveGuard({n:0,until:0});
+    if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+    openMain();
+    toast('اتعملت الخزنة ✓ محدش يقدر يفتحها غيرك');
+  }catch(ex){err.textContent='حصلت مشكلة: '+ex.message;btn.disabled=false;btn.textContent='أنشئ الخزنة'}
+});
+$('#su-restore').addEventListener('click',()=>importBackup(true));
+
+/* -------- الفتح -------- */
+function guardWait(){
+  const g=loadGuard();
+  return Math.max(0,Math.ceil((g.until-Date.now())/1000));
+}
+let guardTicker=null;
+function tickGuard(){
+  clearInterval(guardTicker);
+  const btn=$('#lk-btn');
+  const upd=()=>{
+    const w=guardWait();
+    if(w>0){btn.disabled=true;btn.textContent='استنى '+w+' ثانية...'}
+    else{btn.disabled=false;btn.textContent='افتح الخزنة';clearInterval(guardTicker)}
+  };
+  upd();guardTicker=setInterval(upd,1000);
+}
+$('#lock-form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(guardWait()>0)return;
+  const pw=$('#lk-pw').value, err=$('#lk-err'), btn=$('#lk-btn');
+  if(!pw)return;
+  err.textContent='';
+  btn.disabled=true;btn.innerHTML='<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+P.loader+'</svg> بفتح...';
+  try{
+    const blob=loadBlob();
+    const key=await deriveKey(pw,b64Buf(blob.kdf.salt),blob.kdf.iter);
+    vault=await decryptVault(key,blob);
+    cryptoKey=key;
+    if(!vault.settings)vault.settings={autolockMin:3,lastExport:0};
+    saveGuard({n:0,until:0});
+    $('#lk-pw').value='';
+    openMain();
+  }catch(ex){
+    const g=loadGuard();g.n++;
+    if(g.n>=3)g.until=Date.now()+Math.min(5*Math.pow(2,g.n-3),300)*1000;
+    saveGuard(g);
+    err.textContent='كلمة السر مش صح'+(g.n>=3?' — في تأخير بسبب المحاولات المتكررة':'');
+    $('#lock-form').classList.add('shake');
+    setTimeout(()=>$('#lock-form').classList.remove('shake'),450);
+    btn.disabled=false;btn.textContent='افتح الخزنة';
+    tickGuard();
+  }
+});
+$('#lk-forgot').addEventListener('click',async()=>{
+  const yes=await confirmDlg('نسيت كلمة السر؟',
+    'مفيش أي طريقة لاسترجاعها — دي أساس الأمان. الحل الوحيد إنك تمسح الخزنة وتبدأ من جديد (أو تسترجع نسخة احتياطية قديمة لسه فاكر كلمة سرها). عشان تمسح كل حاجة نهائيًا اكتب "امسح" تحت.',
+    {danger:true,requireText:'امسح',yesLabel:'امسح كل حاجة'});
+  if(yes){localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_GUARD);location.reload()}
+});
+
+/* -------- القفل -------- */
+function lock(){
+  vault=null;cryptoKey=null;pwSearch='';
+  $('#content').innerHTML='';
+  closeSheet();
+  $('#cf-bk').classList.remove('on');
+  show('#scr-lock');
+  $('#lk-err').textContent='';
+  setTimeout(()=>$('#lk-pw').focus(),80);
+}
+$('#btn-lock').addEventListener('click',()=>{lock();toast('اتقفلت ✓')});
+
+/* قفل تلقائي: خمول + ترك الصفحة */
+['pointerdown','keydown','touchstart','input'].forEach(ev=>
+  document.addEventListener(ev,()=>{lastActivity=Date.now()},{passive:true}));
+setInterval(()=>{
+  if(!vault)return;
+  const mins=(vault.settings&&vault.settings.autolockMin)||3;
+  if(Date.now()-lastActivity>mins*60000){lock();toast('اتقفلت تلقائيًا 🔒')}
+},10000);
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){hiddenAt=Date.now()}
+  else{
+    if(vault&&hiddenAt&&Date.now()-hiddenAt>60000){lock();toast('اتقفلت تلقائيًا 🔒')}
+    hiddenAt=null;
+  }
+});
+
+/* -------- الرئيسية -------- */
+const TABS=[
+  {id:'pw',label:'الباسوردات',icon:'key'},
+  {id:'cards',label:'الكروت',icon:'card'},
+  {id:'money',label:'الفلوس',icon:'cash'},
+  {id:'set',label:'الإعدادات',icon:'sliders'},
+];
+function needBackup(){
+  if(!vault)return false;
+  const items=vault.passwords.length+vault.cards.length+vault.money.length;
+  const last=(vault.settings&&vault.settings.lastExport)||0;
+  return items>0&&(Date.now()-last>30*24*3600*1000);
+}
+
+/* ---- التحديثات (نسخة التطبيق بس) ---- */
+let updAvailable=null; // اسم الإصدار المتاح لو في تحديث
+let updSilent=false;   // الفحص التلقائي اليومي بيبقى صامت
+function updUrl(){return ((vault&&vault.settings&&vault.settings.updateUrl)||DEFAULT_UPDATE_URL).trim()}
+function maybeAutoCheckUpdate(){
+  if(!window.Khazna||!window.Khazna.checkUpdate||!vault)return;
+  const u=updUrl();if(!u)return;
+  const last=vault.settings.lastUpdateCheck||0;
+  if(Date.now()-last<24*3600*1000)return;
+  vault.settings.lastUpdateCheck=Date.now();persist();
+  updSilent=true;
+  window.Khazna.checkUpdate(APP_VCODE,u);
+}
+window.__khaznaUpdateState=async o=>{
+  const st=o.state, info=o.info||'', el=$('#upd-status'), silent=updSilent;
+  if(st==='checking'){if(el&&!silent)el.textContent='بشيّك...';return}
+  if(st==='available'){
+    updSilent=false;updAvailable=info;
+    if(vault){renderTabs();if(currentTab==='set')renderTab()}
+    const yes=await confirmDlg('تحديث متاح 🎉','في إصدار أجدد ('+info+') من اللي عندك ('+APP_VERSION+'). نثبّته دلوقتي؟ بياناتك مش هتتأثر — التحديث بيتركب فوق التطبيق زي ما هو.',{yesLabel:'ثبّت التحديث'});
+    if(yes&&window.Khazna)window.Khazna.installUpdate();
+    return;
+  }
+  updSilent=false;
+  if(silent)return; // الفحص الصامت ميشوّشش لو مفيش جديد
+  if(!el)return;
+  if(st==='none')el.textContent='انت على آخر إصدار ('+APP_VERSION+') ✓';
+  else if(st==='downloading')el.textContent='بجهّز التحديث...';
+  else if(st==='installing')el.textContent='شاشة التثبيت هتظهرلك دلوقتي — دوس تحديث';
+  else if(st==='needPermission')el.textContent='فعّل "السماح من هذا المصدر" من الشاشة اللي فتحت، وارجع دوس "شيّك على تحديث" وثبّت تاني';
+  else if(st==='error')el.textContent='مشكلة: '+(info||'حاول تاني');
+};
+function renderTabs(){
+  $('#tabs').innerHTML=TABS.map(t=>
+    '<button data-tab="'+t.id+'" class="'+(currentTab===t.id?'on':'')+'" aria-label="'+t.label+'">'+
+    (t.id==='set'&&(needBackup()||updAvailable)?'<span class="dot"></span>':'')+
+    ic(t.icon)+'<span>'+t.label+'</span></button>').join('');
+}
+function openMain(){
+  currentTab='pw';
+  show('#scr-main');
+  $('#scr-main').classList.add('fade-in');
+  renderTabs();renderTab();
+  maybeAutoCheckUpdate();
+}
+$('#tabs').addEventListener('click',e=>{
+  const b=e.target.closest('[data-tab]');if(!b)return;
+  currentTab=b.dataset.tab;renderTabs();renderTab();
+});
+$('#fab').addEventListener('click',()=>{
+  if(currentTab==='pw')openPwForm();
+  else if(currentTab==='cards')openCardForm();
+  else if(currentTab==='money')openMoneyForm();
+});
+
+function renderTab(){
+  if(!vault)return;
+  $('#fab').classList.toggle('hide',currentTab==='set');
+  const c=$('#content');
+  if(currentTab==='pw')renderPw(c);
+  else if(currentTab==='cards')renderCards(c);
+  else if(currentTab==='money')renderMoney(c);
+  else renderSettings(c);
+}
+
+/* -------- الباسوردات -------- */
+function renderPw(c){
+  c.innerHTML=
+    '<div class="search">'+ic('search')+'<input type="search" id="pw-q" placeholder="دوّر على خدمة أو إيميل..." autocomplete="off" value="'+esc(pwSearch)+'"></div>'+
+    '<div id="pw-list" style="display:flex;flex-direction:column;gap:10px"></div>';
+  $('#pw-q').addEventListener('input',e=>{pwSearch=e.target.value;renderPwList()});
+  renderPwList();
+}
+function renderPwList(){
+  const q=pwSearch.trim().toLowerCase();
+  const list=vault.passwords
+    .filter(p=>!q||[p.title,p.email,p.url,p.notes].join(' ').toLowerCase().includes(q))
+    .sort((a,b)=>(a.title||'').localeCompare(b.title||'','ar'));
+  const el=$('#pw-list');if(!el)return;
+  if(!list.length){
+    el.innerHTML='<div class="empty">'+ic('key')+'<span>'+(q?'مفيش نتايج للبحث ده':'لسه مفيش باسوردات محفوظة.<br>دوس <b>+</b> وابدأ ضيف أول واحد')+'</span></div>';
+    return;
+  }
+  el.innerHTML=list.map(p=>
+    '<div class="row" data-act="open-pw" data-id="'+p.id+'">'+
+      '<div class="row-ic">'+ic('key')+'</div>'+
+      '<div class="row-main"><div class="row-t">'+esc(p.title)+'</div>'+
+      (p.email?'<div class="row-s ltr">'+esc(p.email)+'</div>':'')+'</div>'+
+      '<div class="row-acts">'+
+        (p.email?'<button class="icon-btn" data-act="copy-user" data-id="'+p.id+'" aria-label="انسخ الإيميل">'+ic('at')+'</button>':'')+
+        '<button class="icon-btn" data-act="copy-pass" data-id="'+p.id+'" aria-label="انسخ الباسورد">'+ic('copy')+'</button>'+
+      '</div>'+
+    '</div>').join('');
+}
+
+/* -------- الكروت -------- */
+function renderCards(c){
+  if(!vault.cards.length){
+    c.innerHTML='<div class="empty">'+ic('card')+'<span>لسه مفيش كروت محفوظة.<br>دوس <b>+</b> وضيف أول كارت — كله متشفّر على جهازك</span></div>';
+    return;
+  }
+  c.innerHTML=vault.cards.map(cd=>{
+    const br=cardBrand(cd.number);
+    return '<div class="row" data-act="open-card" data-id="'+cd.id+'">'+
+      '<div class="row-ic cy">'+ic('card')+'</div>'+
+      '<div class="row-main"><div class="row-t">'+esc(cd.name)+'</div>'+
+      '<div class="row-s mono num ltr">'+maskNum(cd.number)+(cd.expiry?'&nbsp;&nbsp;·&nbsp;&nbsp;'+esc(cd.expiry):'')+'</div></div>'+
+      '<span class="chip '+br.cls+'">'+esc(br.t)+'</span>'+
+      '<button class="icon-btn" data-act="copy-num" data-id="'+cd.id+'" aria-label="انسخ رقم الكارت">'+ic('copy')+'</button>'+
+    '</div>';
+  }).join('');
+}
+
+/* -------- الفلوس -------- */
+function moneyTotals(){
+  const t={};
+  vault.money.filter(m=>!m.settled).forEach(m=>{
+    const cur=m.currency||'ج.م';
+    t[cur]=t[cur]||{pos:0,neg:0};
+    if(m.dir==='lya')t[cur].pos+=Number(m.amount)||0;
+    else t[cur].neg+=Number(m.amount)||0;
+  });
+  return t;
+}
+function renderMoney(c){
+  const t=moneyTotals();
+  const curs=Object.keys(t);
+  let sum='';
+  if(curs.length){
+    sum='<div class="mny-sum num">'+curs.map(cur=>
+      '<span><small>ليك&nbsp;</small><span class="pos">'+fmtAmt(t[cur].pos)+' '+esc(cur)+'</span></span>'+
+      '<span><small>عليك&nbsp;</small><span class="neg">'+fmtAmt(t[cur].neg)+' '+esc(cur)+'</span></span>'
+    ).join('')+'</div>';
+  }
+  const list=[...vault.money].sort((a,b)=>(a.settled?1:0)-(b.settled?1:0)||(b.date||'').localeCompare(a.date||''));
+  if(!list.length){
+    c.innerHTML='<div class="empty">'+ic('cash')+'<span>لسه مفيش مبالغ متسجلة.<br>دوس <b>+</b> وسجّل أول مبلغ — ليك أو عليك</span></div>';
+    return;
+  }
+  c.innerHTML=sum+list.map(m=>{
+    const pos=m.dir==='lya';
+    return '<div class="row'+(m.settled?' settled':'')+'" data-act="open-money" data-id="'+m.id+'">'+
+      '<button class="icon-btn settle-btn'+(m.settled?' done':'')+'" data-act="settle" data-id="'+m.id+'" aria-label="اتسوّت">'+ic('check')+'</button>'+
+      '<div class="row-main"><div class="row-t">'+esc(m.person)+'</div>'+
+      '<div class="row-s">'+(pos?'ليك':'عليك')+(m.date?' · '+fmtDate(m.date):'')+(m.note?' · '+esc(m.note):'')+'</div></div>'+
+      '<span class="num '+(pos?'amt-pos':'amt-neg')+'" style="font-size:1.02rem">'+(pos?'':'−')+fmtAmt(Number(m.amount)||0)+' <small style="font-weight:400;font-size:.72rem">'+esc(m.currency||'ج.م')+'</small></span>'+
+    '</div>';
+  }).join('');
+}
+
+/* -------- الإعدادات -------- */
+function renderSettings(c){
+  const s=vault.settings;
+  const lastEx=s.lastExport? 'آخر نسخة: '+new Date(s.lastExport).toLocaleDateString('ar-EG'):'لسه معملتش ولا نسخة';
+  c.innerHTML=
+    (needBackup()?'<div class="warn-box">'+ic('alert')+'<span><b>خد نسخة احتياطية!</b> عندك بيانات ومعملتش تصدير من أكتر من شهر (أو خالص). لو الموبايل ضاع أو المتصفح اتمسح، النسخة دي هي اللي هترجّعلك كل حاجة.</span></div>':'')+
+    '<div class="set-group">'+
+      '<div class="set-item">'+ic('clock')+'<div class="txt"><b>القفل التلقائي</b><small>يقفل لوحده بعد فترة خمول</small></div>'+
+        '<select id="set-autolock">'+[1,3,5,10].map(m=>'<option value="'+m+'"'+(s.autolockMin===m?' selected':'')+'>'+m+' دقايق</option>').join('')+'</select></div>'+
+      '<button class="set-item" data-act="chpw">'+ic('key')+'<div class="txt"><b>غيّر كلمة السر الرئيسية</b><small>هيعاد تشفير كل حاجة بالجديدة</small></div></button>'+
+    '</div>'+
+    '<div class="set-group">'+
+      '<button class="set-item" data-act="export">'+ic('down')+'<div class="txt"><b>نسخة احتياطية (تصدير)</b><small>'+esc(lastEx)+' — الملف متشفّر، ينفع تحفظه في أي مكان</small></div></button>'+
+      '<button class="set-item" data-act="import">'+ic('up')+'<div class="txt"><b>استرجاع نسخة</b><small>هتستبدل كل اللي موجود دلوقتي</small></div></button>'+
+    '</div>'+
+    (window.Khazna?
+    '<div class="set-group">'+
+      '<button class="set-item" data-act="checkupd">'+ic('down')+'<div class="txt"><b>'+(updAvailable?'تحديث '+esc(updAvailable)+' جاهز — دوس للتثبيت':'شيّك على تحديث')+'</b><small id="upd-status">الإصدار الحالي: '+APP_VERSION+'</small></div></button>'+
+      '<div class="set-item">'+ic('at')+'<div class="txt"><b>لينك التحديثات</b><small>الصفحة العامة اللي التطبيق بيشيّك عليها لوحده مرة كل يوم</small>'+
+      '<input id="set-updurl" class="ltr" style="margin-top:8px;font-size:.78rem;padding:9px 12px" placeholder="https://..." autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(updUrl())+'"></div></div>'+
+    '</div>' : '')+
+    '<div class="set-group">'+
+      '<button class="set-item danger" data-act="erase">'+ic('trash')+'<div class="txt"><b>امسح الخزنة نهائيًا</b><small>مفيش رجوع في الخطوة دي</small></div></button>'+
+    '</div>'+
+    '<div class="sec-note">🛡️ <b>إزاي محمي؟</b> كل بياناتك متشفّرة AES-256-GCM بمفتاح مشتق من كلمة سرك (PBKDF2 بـ600 ألف دورة) ومحفوظة على جهازك بس — مفيش سيرفر ولا حساب، وواجهة الخزنة معزولة عن الإنترنت تمامًا. في نسخة التطبيق، الاتصال الوحيد هو فاحص التحديثات: قراءة بس، ومفيش أي تثبيت غير لتحديث موقّع بمفتاحك انت (التطبيق ونظام أندرويد الاتنين بيرفضوا أي توقيع تاني). كلمة سرك ما بتتخزنش في أي مكان — عشان كده لو نسيتها مفيش استرجاع.</div>'+
+    '<div class="sec-note" style="text-align:center;opacity:.75">Smoyz Safe — إصدار '+APP_VERSION+'</div>';
+  $('#set-autolock').addEventListener('change',async e=>{
+    vault.settings.autolockMin=Number(e.target.value);await persist();toast('اتحفظ ✓');
+  });
+  const uu=$('#set-updurl');
+  if(uu)uu.addEventListener('change',async e=>{
+    vault.settings.updateUrl=e.target.value.trim();
+    await persist();toast('اتحفظ ✓');
+  });
+}
+
+/* ================= Sheet ================= */
+function openSheet(title,bodyHTML){
+  $('#sheet-title').textContent=title;
+  $('#sheet-body').innerHTML=bodyHTML;
+  $('#sheet-bk').classList.add('on');
+  $('#sheet').classList.add('on');
+}
+function closeSheet(){
+  $('#sheet-bk').classList.remove('on');
+  $('#sheet').classList.remove('on');
+  setTimeout(()=>{if(!$('#sheet').classList.contains('on'))$('#sheet-body').innerHTML=''},300);
+}
+$('#sheet-x').addEventListener('click',closeSheet);
+$('#sheet-bk').addEventListener('click',closeSheet);
+
+function peekBtn(id){return '<button type="button" class="peek" data-peek="'+id+'" aria-label="إظهار">'+ic('eye')+'</button>'}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-peek]');if(!b)return;
+  const inp=document.getElementById(b.dataset.peek);if(!inp)return;
+  const showing=inp.type==='text';
+  inp.type=showing?'password':'text';
+  b.innerHTML=ic(showing?'eye':'eyeoff');
+});
+
+/* -------- فورم الباسورد -------- */
+function openPwForm(id){
+  const p=id? vault.passwords.find(x=>x.id===id) : null;
+  openSheet(p?'تعديل باسورد':'باسورد جديد',
+    '<label for="f-title">الخدمة</label><input id="f-title" placeholder="جوجل، فيسبوك، انستجرام..." value="'+esc(p?.title)+'" autocomplete="off">'+
+    '<label for="f-email">الإيميل / اسم المستخدم</label><input id="f-email" class="ltr" placeholder="you@example.com" value="'+esc(p?.email)+'" autocomplete="off" autocapitalize="off" spellcheck="false">'+
+    '<label for="f-pass">الباسورد</label>'+
+    '<div class="field"><input id="f-pass" type="password" class="ltr mono" value="'+esc(p?.password)+'" autocomplete="off" autocapitalize="off" spellcheck="false">'+peekBtn('f-pass')+'</div>'+
+    '<div class="meter"><i id="f-meter"></i></div><div class="meter-lbl" id="f-meter-lbl"></div>'+
+    '<details class="gen"><summary>'+ic('dice')+' ولّدلي باسورد قوي</summary><div class="gen-body">'+
+      '<div class="gen-row"><span>الطول</span><input type="range" id="g-len" min="8" max="32" value="16"><b id="g-len-v" class="num">16</b></div>'+
+      '<div class="gen-row"><input type="checkbox" id="g-up" checked><label for="g-up">حروف كبيرة A-Z</label></div>'+
+      '<div class="gen-row"><input type="checkbox" id="g-dig" checked><label for="g-dig">أرقام 0-9</label></div>'+
+      '<div class="gen-row"><input type="checkbox" id="g-sym" checked><label for="g-sym">رموز !@#$</label></div>'+
+      '<button type="button" class="btn btn-ghost" id="g-go" style="padding:10px">'+ic('dice')+' توليد</button>'+
+    '</div></details>'+
+    '<label for="f-url">اللينك (اختياري)</label><input id="f-url" class="ltr" placeholder="https://..." value="'+esc(p?.url)+'" autocomplete="off" autocapitalize="off">'+
+    '<label for="f-notes">ملاحظات (اختياري)</label><textarea id="f-notes" rows="2">'+esc(p?.notes)+'</textarea>'+
+    '<button class="btn btn-flame" id="f-save">'+(p?'احفظ التعديل':'احفظ')+'</button>'+
+    (p?'<button class="btn btn-danger sheet-del" id="f-del">'+ic('trash')+' امسح الباسورد ده</button>':'')
+  );
+  const passInp=$('#f-pass');
+  const updMeter=()=>{
+    const s=strength(passInp.value);
+    $('#f-meter').style.width=s.pct+'%';$('#f-meter').style.background=s.color;
+    $('#f-meter-lbl').textContent=passInp.value?'القوة: '+s.label:'';
+  };
+  passInp.addEventListener('input',updMeter);updMeter();
+  $('#g-len').addEventListener('input',e=>$('#g-len-v').textContent=e.target.value);
+  $('#g-go').addEventListener('click',()=>{
+    passInp.type='text';
+    passInp.value=genPassword(Number($('#g-len').value),$('#g-up').checked,$('#g-dig').checked,$('#g-sym').checked);
+    updMeter();
+  });
+  $('#f-save').addEventListener('click',async()=>{
+    const title=$('#f-title').value.trim();
+    if(!title){toast('اكتب اسم الخدمة الأول');return}
+    if(!passInp.value){toast('اكتب الباسورد');return}
+    const data={title,email:$('#f-email').value.trim(),password:passInp.value,url:$('#f-url').value.trim(),notes:$('#f-notes').value.trim()};
+    if(p)Object.assign(p,data,{updatedAt:Date.now()});
+    else vault.passwords.push({id:uid(),createdAt:Date.now(),updatedAt:Date.now(),...data});
+    await persist();closeSheet();renderTab();renderTabs();toast('اتحفظ ✓');
+  });
+  if(p)$('#f-del').addEventListener('click',async()=>{
+    const yes=await confirmDlg('مسح "'+p.title+'"؟','مش هتقدر ترجّعه تاني.',{danger:true,yesLabel:'امسح'});
+    if(!yes)return;
+    vault.passwords=vault.passwords.filter(x=>x.id!==p.id);
+    await persist();closeSheet();renderTab();toast('اتمسح');
+  });
+}
+
+/* -------- فورم الكارت -------- */
+function openCardForm(id){
+  const cd=id? vault.cards.find(x=>x.id===id) : null;
+  openSheet(cd?'تعديل كارت':'كارت جديد',
+    '<label for="c-name">اسم الكارت</label><input id="c-name" placeholder="فيزا CIB، ماستر البنك الأهلي..." value="'+esc(cd?.name)+'" autocomplete="off">'+
+    '<label for="c-num">رقم الكارت</label>'+
+    '<div class="field"><input id="c-num" type="password" inputmode="numeric" class="ltr mono num" value="'+esc(cd?.number)+'" autocomplete="off" maxlength="23" placeholder="0000 0000 0000 0000">'+peekBtn('c-num')+'</div>'+
+    '<div class="f-row">'+
+      '<div><label for="c-exp">تاريخ الانتهاء</label><input id="c-exp" class="ltr num" inputmode="numeric" placeholder="MM/YY" maxlength="5" value="'+esc(cd?.expiry)+'" autocomplete="off"></div>'+
+      '<div><label for="c-cvv">CVV</label><div class="field"><input id="c-cvv" type="password" class="ltr num" inputmode="numeric" maxlength="4" value="'+esc(cd?.cvv)+'" autocomplete="off">'+peekBtn('c-cvv')+'</div></div>'+
+    '</div>'+
+    '<label for="c-holder">اسم صاحب الكارت</label><input id="c-holder" class="ltr" placeholder="ZIAD ..." value="'+esc(cd?.holder)+'" autocomplete="off" autocapitalize="characters">'+
+    '<label for="c-notes">ملاحظات (اختياري — PIN مثلًا)</label><textarea id="c-notes" rows="2">'+esc(cd?.notes)+'</textarea>'+
+    (cd?'<div class="reveal-line"><span class="lbl">الرقم كامل</span><span class="val mono num ltr">'+esc(groupNum(cd.number))+'</span><button class="icon-btn" data-act="copy-num" data-id="'+cd.id+'">'+ic('copy')+'</button></div>':'')+
+    '<button class="btn btn-flame" id="c-save">'+(cd?'احفظ التعديل':'احفظ')+'</button>'+
+    (cd?'<button class="btn btn-danger sheet-del" id="c-del">'+ic('trash')+' امسح الكارت ده</button>':'')
+  );
+  $('#c-num').addEventListener('input',e=>{
+    const el=e.target;
+    if(el.type==='text')el.value=groupNum(el.value);
+    else el.value=el.value.replace(/[^\d ]/g,'');
+  });
+  $('#c-exp').addEventListener('input',e=>{
+    let v=e.target.value.replace(/\D/g,'').slice(0,4);
+    e.target.value=v.length>2? v.slice(0,2)+'/'+v.slice(2):v;
+  });
+  $('#c-cvv').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'')});
+  $('#c-save').addEventListener('click',async()=>{
+    const name=$('#c-name').value.trim();
+    const number=$('#c-num').value.replace(/\D/g,'');
+    if(!name){toast('اكتب اسم الكارت الأول');return}
+    if(number.length<12){toast('رقم الكارت مش مكتمل');return}
+    const data={name,number,expiry:$('#c-exp').value.trim(),cvv:$('#c-cvv').value.trim(),holder:$('#c-holder').value.trim(),notes:$('#c-notes').value.trim()};
+    if(cd)Object.assign(cd,data,{updatedAt:Date.now()});
+    else vault.cards.push({id:uid(),createdAt:Date.now(),...data});
+    await persist();closeSheet();renderTab();renderTabs();toast('اتحفظ ✓');
+  });
+  if(cd)$('#c-del').addEventListener('click',async()=>{
+    const yes=await confirmDlg('مسح "'+cd.name+'"؟','مش هتقدر ترجّعه تاني.',{danger:true,yesLabel:'امسح'});
+    if(!yes)return;
+    vault.cards=vault.cards.filter(x=>x.id!==cd.id);
+    await persist();closeSheet();renderTab();toast('اتمسح');
+  });
+}
+
+/* -------- فورم الفلوس -------- */
+function openMoneyForm(id){
+  const m=id? vault.money.find(x=>x.id===id) : null;
+  let dir=m?m.dir:'lya';
+  openSheet(m?'تعديل مبلغ':'مبلغ جديد',
+    '<div class="seg" id="m-seg">'+
+      '<button type="button" data-dir="lya">ليّا (يرجعلي) 💰</button>'+
+      '<button type="button" data-dir="alya">عليّا (أرجّعه)</button>'+
+    '</div>'+
+    '<label for="m-person">مين؟</label><input id="m-person" placeholder="اسم الشخص أو الجهة" value="'+esc(m?.person)+'" autocomplete="off">'+
+    '<div class="f-row">'+
+      '<div><label for="m-amount">المبلغ</label><input id="m-amount" type="number" inputmode="decimal" step="any" min="0" class="ltr num" value="'+esc(m?.amount)+'" autocomplete="off"></div>'+
+      '<div><label for="m-cur">العملة</label><input id="m-cur" value="'+esc(m?m.currency:'ج.م')+'" autocomplete="off"></div>'+
+    '</div>'+
+    '<label for="m-date">التاريخ</label><input id="m-date" type="date" class="ltr num" value="'+esc(m?m.date:todayISO())+'">'+
+    '<label for="m-note">ملاحظة (اختياري)</label><input id="m-note" placeholder="سلفة، حساب شغل، قسط..." value="'+esc(m?.note)+'" autocomplete="off">'+
+    '<button class="btn btn-flame" id="m-save">'+(m?'احفظ التعديل':'احفظ')+'</button>'+
+    (m?'<button class="btn btn-danger sheet-del" id="m-del">'+ic('trash')+' امسح المبلغ ده</button>':'')
+  );
+  const seg=$('#m-seg');
+  const paintSeg=()=>{
+    seg.querySelectorAll('button').forEach(b=>{
+      b.className='';
+      if(b.dataset.dir===dir)b.className=dir==='lya'?'on-pos':'on-neg';
+    });
+  };
+  paintSeg();
+  seg.addEventListener('click',e=>{const b=e.target.closest('[data-dir]');if(b){dir=b.dataset.dir;paintSeg()}});
+  $('#m-save').addEventListener('click',async()=>{
+    const person=$('#m-person').value.trim();
+    const amount=Number($('#m-amount').value);
+    if(!person){toast('اكتب اسم الشخص الأول');return}
+    if(!amount||amount<=0){toast('اكتب المبلغ');return}
+    const data={person,amount,dir,currency:$('#m-cur').value.trim()||'ج.م',date:$('#m-date').value,note:$('#m-note').value.trim()};
+    if(m)Object.assign(m,data);
+    else vault.money.push({id:uid(),settled:false,createdAt:Date.now(),...data});
+    await persist();closeSheet();renderTab();renderTabs();toast('اتحفظ ✓');
+  });
+  if(m)$('#m-del').addEventListener('click',async()=>{
+    const yes=await confirmDlg('مسح مبلغ "'+m.person+'"؟','مش هتقدر ترجّعه تاني.',{danger:true,yesLabel:'امسح'});
+    if(!yes)return;
+    vault.money=vault.money.filter(x=>x.id!==m.id);
+    await persist();closeSheet();renderTab();toast('اتمسح');
+  });
+}
+
+/* ================= أفعال القوائم ================= */
+$('#content').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-act]');if(!b||!vault)return;
+  const act=b.dataset.act, id=b.dataset.id;
+  if(act==='open-pw')openPwForm(id);
+  else if(act==='copy-user'){
+    const p=vault.passwords.find(x=>x.id===id);
+    if(p)copyText(p.email,{label:'الإيميل اتنسخ'});
+  }
+  else if(act==='copy-pass'){
+    const p=vault.passwords.find(x=>x.id===id);
+    if(p)copyText(p.password,{sensitive:true,label:'الباسورد اتنسخ'});
+  }
+  else if(act==='open-card')openCardForm(id);
+  else if(act==='copy-num'){
+    const c=vault.cards.find(x=>x.id===id);
+    if(c)copyText(c.number,{sensitive:true,label:'رقم الكارت اتنسخ'});
+  }
+  else if(act==='open-money')openMoneyForm(id);
+  else if(act==='settle'){
+    const m=vault.money.find(x=>x.id===id);
+    if(m){m.settled=!m.settled;await persist();renderTab();toast(m.settled?'اتسوّت ✓':'رجع مفتوح')}
+  }
+  else if(act==='chpw')openChangePw();
+  else if(act==='export')exportBackup();
+  else if(act==='import')importBackup(false);
+  else if(act==='erase')eraseAll();
+  else if(act==='checkupd'){
+    const u=updUrl();
+    if(!u){toast('حط لينك التحديثات في الخانة اللي تحت الأول');return}
+    updSilent=false;
+    window.Khazna.checkUpdate(APP_VCODE,u);
+  }
+});
+/* نسخ رقم الكارت من جوه الـsheet */
+$('#sheet-body').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act="copy-num"]');if(!b||!vault)return;
+  const c=vault.cards.find(x=>x.id===b.dataset.id);
+  if(c)copyText(c.number,{sensitive:true,label:'رقم الكارت اتنسخ'});
+});
+
+/* ================= إعدادات: أكشنات ================= */
+function openChangePw(){
+  openSheet('تغيير كلمة السر الرئيسية',
+    '<label for="ch-old">كلمة السر الحالية</label>'+
+    '<div class="field"><input id="ch-old" type="password" class="ltr" autocomplete="off">'+peekBtn('ch-old')+'</div>'+
+    '<label for="ch-new">الجديدة</label>'+
+    '<div class="field"><input id="ch-new" type="password" class="ltr" autocomplete="new-password">'+peekBtn('ch-new')+'</div>'+
+    '<div class="meter"><i id="ch-meter"></i></div><div class="meter-lbl" id="ch-meter-lbl"></div>'+
+    '<label for="ch-new2">تأكيد الجديدة</label>'+
+    '<div class="field"><input id="ch-new2" type="password" class="ltr" autocomplete="new-password">'+peekBtn('ch-new2')+'</div>'+
+    '<div class="gate-err" id="ch-err"></div>'+
+    '<button class="btn btn-flame" id="ch-go">غيّر كلمة السر</button>'
+  );
+  $('#ch-new').addEventListener('input',e=>{
+    const s=strength(e.target.value);
+    $('#ch-meter').style.width=s.pct+'%';$('#ch-meter').style.background=s.color;
+    $('#ch-meter-lbl').textContent=e.target.value?'القوة: '+s.label:'';
+  });
+  $('#ch-go').addEventListener('click',async()=>{
+    const err=$('#ch-err');err.textContent='';
+    const old=$('#ch-old').value,nw=$('#ch-new').value,nw2=$('#ch-new2').value;
+    if(nw.length<8){err.textContent='الجديدة لازم 8 أحرف على الأقل';return}
+    if(nw!==nw2){err.textContent='الجديدة وتأكيدها مش زي بعض';return}
+    const btn=$('#ch-go');btn.disabled=true;btn.textContent='ثواني...';
+    try{
+      const blob=loadBlob();
+      const oldKey=await deriveKey(old,b64Buf(blob.kdf.salt),blob.kdf.iter);
+      await decryptVault(oldKey,blob); // تأكيد إن القديمة صح
+      const salt=crypto.getRandomValues(new Uint8Array(16));
+      const kdf={alg:'PBKDF2-SHA256',iter:KDF_ITER,salt:bufB64(salt)};
+      cryptoKey=await deriveKey(nw,salt,KDF_ITER);
+      saveBlob(await encryptVault(cryptoKey,vault,kdf));
+      closeSheet();toast('اتغيّرت ✓ متنساش الجديدة!');
+    }catch(ex){err.textContent='كلمة السر الحالية مش صح';btn.disabled=false;btn.textContent='غيّر كلمة السر'}
+  });
+}
+
+async function exportBackup(){
+  const blob=loadBlob();if(!blob)return;
+  const d=new Date(), name='smoyz-safe-backup-'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.json';
+  const payload=JSON.stringify(blob);
+  const markDone=async()=>{
+    if(vault){vault.settings.lastExport=Date.now();await persist();renderTab();renderTabs()}
+    toast('اتصدّرت ✓ — الملف متشفّر ومحتاج كلمة سرك');
+  };
+  if(window.Khazna&&window.Khazna.exportBackup){ // جوه تطبيق الأندرويد: نافذة الحفظ الأصلية
+    window.__khaznaExportDone=async ok=>{
+      window.__khaznaExportDone=null;
+      if(ok)await markDone();else toast('التصدير اتلغى');
+    };
+    window.Khazna.exportBackup(payload,name);
+    return;
+  }
+  const file=new Blob([payload],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(file);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  await markDone();
+}
+
+async function applyImportedBackup(txt,fromSetup){
+  try{
+    const blob=JSON.parse(txt);
+    if(!(blob&&blob.v===1&&blob.kdf&&blob.kdf.salt&&blob.kdf.iter&&blob.cipher&&blob.cipher.iv&&blob.cipher.data))
+      throw new Error('صيغة الملف مش مفهومة');
+    if(!fromSetup&&loadBlob()){
+      const yes=await confirmDlg('استرجاع نسخة احتياطية','دي هتستبدل كل اللي في الخزنة دلوقتي بمحتوى النسخة. متأكد؟',{danger:true,yesLabel:'استبدل'});
+      if(!yes)return;
+    }
+    saveBlob(blob);saveGuard({n:0,until:0});
+    location.reload();
+  }catch(ex){toast('الملف ده مش نسخة خزنة صالحة')}
+}
+function importBackup(fromSetup){
+  if(window.Khazna&&window.Khazna.importBackup){ // جوه تطبيق الأندرويد: نافذة اختيار الملفات الأصلية
+    window.__khaznaImportData=txt=>{window.__khaznaImportData=null;applyImportedBackup(txt,fromSetup)};
+    window.Khazna.importBackup();
+    return;
+  }
+  const fi=$('#file-in');
+  fi.onchange=async()=>{
+    const f=fi.files[0];fi.value='';
+    if(!f)return;
+    applyImportedBackup(await f.text(),fromSetup);
+  };
+  fi.click();
+}
+
+async function eraseAll(){
+  const yes=await confirmDlg('مسح الخزنة نهائيًا',
+    'كل الباسوردات والكروت والمبالغ هتتمسح من الجهاز ده ومفيش أي رجوع. لو متأكد اكتب "امسح" تحت.',
+    {danger:true,requireText:'امسح',yesLabel:'امسح كل حاجة'});
+  if(!yes)return;
+  localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_GUARD);
+  location.reload();
+}
+
+boot();
+</script>
