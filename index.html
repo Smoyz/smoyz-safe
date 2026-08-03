@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <style>
-/* ===== الخزنة — Vancore Vault ===== */
+/* ===== Smoyz Safe ===== */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   /* هوية Smoyz — نيون على أسود بنفسجي (من smoyz-hr/css/tokens.css) */
@@ -458,11 +458,19 @@ async function decryptVault(key,blob){
 }
 
 /* ================= تخزين ================= */
-const APP_VERSION='1.4'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=5;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='1.5'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=6;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL=''; // اللينك العام لصفحة التنزيل — بيتبيك هنا لما يتعمل
-const LS_KEY='vancore.khazna.v1';
-const LS_GUARD='vancore.khazna.guard';
+const LS_KEY='smoyz.safe.v1';
+const LS_GUARD='smoyz.safe.guard';
+/* ترحيل بيانات النسخ القديمة (قبل تغيير الاسم) — مرة واحدة وبيمسح القديم */
+try{
+  const _old='vancore.khazna.v1', _oldG='vancore.khazna.guard';
+  if(!localStorage.getItem(LS_KEY)&&localStorage.getItem(_old)){
+    localStorage.setItem(LS_KEY,localStorage.getItem(_old));
+    localStorage.removeItem(_old);localStorage.removeItem(_oldG);
+  }
+}catch(e){}
 function loadBlob(){try{const b=JSON.parse(localStorage.getItem(LS_KEY));return (b&&b.v===1&&b.kdf&&b.cipher)?b:null}catch(e){return null}}
 function saveBlob(b){localStorage.setItem(LS_KEY,JSON.stringify(b))}
 function loadGuard(){try{return JSON.parse(localStorage.getItem(LS_GUARD))||{n:0,until:0}}catch(e){return{n:0,until:0}}}
