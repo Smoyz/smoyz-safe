@@ -406,8 +406,8 @@ details.gen summary svg{width:17px;height:17px}
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='1.7'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=8;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='1.8'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=9;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -451,7 +451,7 @@ ar:{
   searchPh:'دوّر على خدمة أو إيميل...',
   pwEmptyQ:'مفيش نتايج للبحث ده', pwEmpty:'لسه مفيش باسوردات محفوظة.<br>دوس <b>+</b> وابدأ ضيف أول واحد',
   cardsEmpty:'لسه مفيش كروت محفوظة.<br>دوس <b>+</b> وضيف أول كارت — كله متشفّر على جهازك',
-  moneyEmpty:'لسه مفيش حاجة متسجلة.<br>دوس <b>+</b> وسجّل دين أو قسط أو جمعية',
+  moneyEmpty:'لسه مفيش حاجة متسجلة.<br>دوس <b>+</b> وسجّل دين أو قسط أو جمعية أو مصروف',
   copyUser:'انسخ الإيميل', copyPass:'انسخ الباسورد', copyNum:'انسخ رقم الكارت',
   copiedMail:'الإيميل اتنسخ', copiedPass:'الباسورد اتنسخ', copiedNum:'رقم الكارت اتنسخ',
   copied:'اتنسخ', copyClip:' ✓ — هيتمسح من الكليبورد بعد ٤٠ ثانية', copyBlocked:'النسخ اتمنع من المتصفح',
@@ -520,6 +520,14 @@ ar:{
   secNote:'🛡️ <b>إزاي محمي؟</b> كل بياناتك متشفّرة AES-256-GCM بمفتاح مشتق من كلمة سرك (PBKDF2 بـ600 ألف دورة) ومحفوظة على جهازك بس — مفيش سيرفر ولا حساب. الاتصال الوحيد هو فحص التحديثات، ومفيش تثبيت غير لتحديث موقّع رسمي. كلمة سرك ما بتتخزنش في أي مكان.',
   verLine:'Smoyz Safe — إصدار ',
   typedWord:'اكتب: ',
+  typeExp:'مصروف', typeExpS:'سجّل مصروفاتك وشوف صرفت كام في الشهر',
+  typeSav:'تحويش', typeSavS:'سجّل اللي بتحوّشه وتابع مجموعه',
+  expNew:'مصروف جديد', expEdit:'تعديل مصروف', savNew:'تحويش جديد', savEdit:'تعديل تحويش',
+  eTitle:'صرفت على إيه؟', eTitlePh:'أكل، بنزين، فواتير، خروجة...',
+  sTitle:'تحويش لإيه؟ (اختياري)', sTitlePh:'حساب توفير، ظرف البيت...',
+  needETitle:'اكتب صرفت على إيه',
+  thisMonth:'الشهر ده:', spentW:'صرفت', savedW:'حوّشت',
+  secExp:'مصروفات الشهر ده', secSav:'التحويش',
   langName:'English'
 },
 en:{
@@ -540,7 +548,7 @@ en:{
   searchPh:'Search service or email...',
   pwEmptyQ:'No results for this search', pwEmpty:'No passwords saved yet.<br>Tap <b>+</b> to add your first one',
   cardsEmpty:'No cards saved yet.<br>Tap <b>+</b> to add one — everything is encrypted on your device',
-  moneyEmpty:'Nothing recorded yet.<br>Tap <b>+</b> to add a debt, installment or savings circle',
+  moneyEmpty:'Nothing recorded yet.<br>Tap <b>+</b> to add a debt, installment, expense or saving',
   copyUser:'Copy email', copyPass:'Copy password', copyNum:'Copy card number',
   copiedMail:'Email copied', copiedPass:'Password copied', copiedNum:'Card number copied',
   copied:'Copied', copyClip:' ✓ — clipboard clears in 40s', copyBlocked:'Copy was blocked by the browser',
@@ -610,6 +618,14 @@ en:{
   secNote:'🛡️ <b>How is it protected?</b> Everything is encrypted with AES-256-GCM using a key derived from your password (PBKDF2, 600k rounds) and stored only on your device — no server, no accounts. The only connection is the update check, and nothing installs unless officially signed. Your password is never stored anywhere.',
   verLine:'Smoyz Safe — version ',
   typedWord:'Type: ',
+  typeExp:'Expense', typeExpS:'Track spending and see monthly totals',
+  typeSav:'Savings', typeSavS:'Record what you put aside and watch it grow',
+  expNew:'New expense', expEdit:'Edit expense', savNew:'New saving', savEdit:'Edit saving',
+  eTitle:'What did you spend on?', eTitlePh:'Food, fuel, bills, outing...',
+  sTitle:'Saving for? (optional)', sTitlePh:'Savings account, home jar...',
+  needETitle:'Enter what you spent on',
+  thisMonth:'This month:', spentW:'spent', savedW:'saved',
+  secExp:'This month expenses', secSav:'Savings',
   langName:'العربية'
 }};
 let lang=localStorage.getItem(LS_LANG)||'ar';
@@ -665,7 +681,9 @@ const P={
   users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.8"/><path d="M16 14.6a5.6 5.6 0 0 1 5.5 5.4"/>',
   bell:'<path d="M18 9a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.5 21a2 2 0 0 0 3 0"/>',
   globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13.4 13.4 0 0 1 0 18 13.4 13.4 0 0 1 0-18z"/>',
-  finger:'<path d="M7 19.5c-1.2-2-2-4.2-2-6.5a7 7 0 0 1 14 0c0 1.2-.1 2.4-.4 3.5"/><path d="M12 9.5a3.5 3.5 0 0 1 3.5 3.5c0 2.6.4 4.6 1 6.5"/><path d="M12 13v3.5c0 1.8.3 3.3.8 4.5"/><path d="M8.5 13a3.5 3.5 0 0 1 3.5-3.5"/>'
+  finger:'<path d="M7 19.5c-1.2-2-2-4.2-2-6.5a7 7 0 0 1 14 0c0 1.2-.1 2.4-.4 3.5"/><path d="M12 9.5a3.5 3.5 0 0 1 3.5 3.5c0 2.6.4 4.6 1 6.5"/><path d="M12 13v3.5c0 1.8.3 3.3.8 4.5"/><path d="M8.5 13a3.5 3.5 0 0 1 3.5-3.5"/>',
+  bag:'<path d="M6.5 8h11l-1 12.5h-9L6.5 8z"/><path d="M9 8a3 3 0 0 1 6 0"/>',
+  save:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3.5 9l2.2-4h12.6l2.2 4"/><path d="M10 14.5h4"/>'
 };
 const ic=n=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
 
@@ -704,6 +722,7 @@ let currentTab='pw';
 let pwSearch='';
 let lastActivity=Date.now();
 let hiddenAt=null;
+let expandedMonths=new Set();
 
 const emptyVault=()=>({passwords:[],cards:[],money:[],settings:{autolockMin:3,lastExport:0}});
 
@@ -813,6 +832,10 @@ function todayISO(){
 function monthKey(){
   const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function fmtMonth(k){
+  try{return new Date(k+'-01T00:00:00').toLocaleDateString(lang==='ar'?'ar-EG':'en-GB',{month:'long',year:'numeric'})}
+  catch(e){return k}
 }
 const defCur=()=>lang==='ar'?'ج.م':'EGP';
 function cardBrand(num){
@@ -1146,12 +1169,40 @@ function instRow(m){
     '<div class="row-ic '+(isGam?'vi':'cy')+'" style="width:34px;height:34px">'+ic(isGam?'users':'cal')+'</div>'+
   '</div>';
 }
+function expRow(e){
+  return '<div class="row" data-act="open-money" data-id="'+e.id+'">'+
+    '<div class="row-main"><div class="row-t">'+esc(e.title)+'</div>'+
+    '<div class="row-s">'+fmtDate(e.date)+(e.note?' · '+esc(e.note):'')+'</div></div>'+
+    '<span class="num amt-neg" style="font-size:1rem">−'+fmtAmt(Number(e.amount)||0)+' <small style="font-weight:400;font-size:.72rem">'+esc(e.currency||defCur())+'</small></span>'+
+  '</div>';
+}
+function savRow(e){
+  return '<div class="row" data-act="open-money" data-id="'+e.id+'">'+
+    '<div class="row-main"><div class="row-t">'+esc(e.title||t('secSav'))+'</div>'+
+    '<div class="row-s">'+fmtDate(e.date)+(e.note?' · '+esc(e.note):'')+'</div></div>'+
+    '<span class="num amt-pos" style="font-size:1rem">+'+fmtAmt(Number(e.amount)||0)+' <small style="font-weight:400;font-size:.72rem">'+esc(e.currency||defCur())+'</small></span>'+
+  '</div>';
+}
 function renderMoney(c){
+  const mk=monthKey();
+  const monthOf=d=>(d||'').slice(0,7);
   const pend=pendingPayments();
   const tt=moneyTotals();
   const curs=Object.keys(tt);
   let html='';
   if(pend>0)html+='<div class="pay-banner">'+ic('bell')+'<span>'+t('payBanner',{n:pend})+'</span></div>';
+  const exps=vault.money.filter(m=>m.kind==='expense');
+  const savs=vault.money.filter(m=>m.kind==='saving');
+  /* ملخص الشهر الحالي: صرفت كام وحوّشت كام */
+  const ms={};
+  exps.filter(e=>monthOf(e.date)===mk).forEach(e=>{const cu=e.currency||defCur();ms[cu]=ms[cu]||{sp:0,sv:0};ms[cu].sp+=Number(e.amount)||0});
+  savs.filter(e=>monthOf(e.date)===mk).forEach(e=>{const cu=e.currency||defCur();ms[cu]=ms[cu]||{sp:0,sv:0};ms[cu].sv+=Number(e.amount)||0});
+  if(Object.keys(ms).length){
+    html+='<div class="mny-sum num"><small>'+t('thisMonth')+'</small>'+Object.keys(ms).map(cu=>
+      '<span><small>'+t('spentW')+'&nbsp;</small><span class="neg">'+fmtAmt(ms[cu].sp)+' '+esc(cu)+'</span></span>'+
+      '<span><small>'+t('savedW')+'&nbsp;</small><span class="pos">'+fmtAmt(ms[cu].sv)+' '+esc(cu)+'</span></span>'
+    ).join('')+'</div>';
+  }
   if(curs.length){
     html+='<div class="mny-sum num">'+curs.map(cur=>
       '<span><small>'+t('forYou')+'&nbsp;</small><span class="pos">'+fmtAmt(tt[cur].pos)+' '+esc(cur)+'</span></span>'+
@@ -1161,12 +1212,32 @@ function renderMoney(c){
   const debts=vault.money.filter(m=>m.kind==='debt').sort((a,b)=>(a.settled?1:0)-(b.settled?1:0)||(b.date||'').localeCompare(a.date||''));
   const insts=vault.money.filter(m=>m.kind==='installment').sort((a,b)=>(a.settled?1:0)-(b.settled?1:0));
   const gams=vault.money.filter(m=>m.kind==='gamiya').sort((a,b)=>(a.settled?1:0)-(b.settled?1:0));
-  if(!debts.length&&!insts.length&&!gams.length){
+  if(!debts.length&&!insts.length&&!gams.length&&!exps.length&&!savs.length){
     c.innerHTML='<div class="empty">'+ic('cash')+'<span>'+t('moneyEmpty')+'</span></div>';
     return;
   }
   if(insts.length)html+='<div class="sec-h">'+ic('cal')+t('secInst')+'</div>'+insts.map(instRow).join('');
   if(gams.length)html+='<div class="sec-h">'+ic('users')+t('secGam')+'</div>'+gams.map(instRow).join('');
+  if(exps.length){
+    html+='<div class="sec-h">'+ic('bag')+t('secExp')+'</div>';
+    const curExp=exps.filter(e=>monthOf(e.date)===mk).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    html+=curExp.map(expRow).join('');
+    const past={};
+    exps.filter(e=>monthOf(e.date)!==mk).forEach(e=>{const k2=monthOf(e.date)||'?';(past[k2]=past[k2]||[]).push(e)});
+    Object.keys(past).sort().reverse().forEach(k2=>{
+      const tot={};past[k2].forEach(e=>{const cu=e.currency||defCur();tot[cu]=(tot[cu]||0)+(Number(e.amount)||0)});
+      html+='<div class="row" data-act="toggle-month" data-id="'+k2+'" style="opacity:.75">'+
+        '<div class="row-main"><div class="row-t">'+esc(fmtMonth(k2))+'</div></div>'+
+        '<span class="num amt-neg" style="font-size:.92rem">−'+Object.keys(tot).map(cu=>fmtAmt(tot[cu])+' '+esc(cu)).join(' · −')+'</span>'+
+      '</div>';
+      if(expandedMonths.has(k2))html+=past[k2].slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(expRow).join('');
+    });
+  }
+  if(savs.length){
+    const tot={};savs.forEach(e=>{const cu=e.currency||defCur();tot[cu]=(tot[cu]||0)+(Number(e.amount)||0)});
+    html+='<div class="sec-h">'+ic('save')+t('secSav')+'<span class="num" style="margin-inline-start:auto;color:var(--ok);font-weight:800">'+Object.keys(tot).map(cu=>fmtAmt(tot[cu])+' '+esc(cu)).join(' · ')+'</span></div>';
+    html+=savs.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(savRow).join('');
+  }
   if(debts.length){
     html+='<div class="sec-h">'+ic('cash')+t('secDebts')+'</div>'+debts.map(m=>{
       const pos=m.dir==='lya';
@@ -1350,17 +1421,21 @@ function openMoneyPicker(){
       '<button data-mtype="debt"><span class="row-ic">'+ic('cash')+'</span><span><b>'+t('typeDebt')+'</b><small>'+t('typeDebtS')+'</small></span></button>'+
       '<button data-mtype="installment"><span class="row-ic cy">'+ic('cal')+'</span><span><b>'+t('typeInst')+'</b><small>'+t('typeInstS')+'</small></span></button>'+
       '<button data-mtype="gamiya"><span class="row-ic vi">'+ic('users')+'</span><span><b>'+t('typeGam')+'</b><small>'+t('typeGamS')+'</small></span></button>'+
+      '<button data-mtype="expense"><span class="row-ic" style="color:var(--amber)">'+ic('bag')+'</span><span><b>'+t('typeExp')+'</b><small>'+t('typeExpS')+'</small></span></button>'+
+      '<button data-mtype="saving"><span class="row-ic" style="color:var(--ok)">'+ic('save')+'</span><span><b>'+t('typeSav')+'</b><small>'+t('typeSavS')+'</small></span></button>'+
     '</div>'
   );
   $('#sheet-body').querySelectorAll('[data-mtype]').forEach(b=>b.addEventListener('click',()=>{
     const k=b.dataset.mtype;
     if(k==='debt')openDebtForm();
+    else if(k==='expense'||k==='saving')openExpForm(null,k);
     else openInstForm(null,k);
   }));
 }
 function openMoneyEdit(id){
   const m=vault.money.find(x=>x.id===id);if(!m)return;
   if(m.kind==='debt')openDebtForm(id);
+  else if(m.kind==='expense'||m.kind==='saving')openExpForm(id,m.kind);
   else openInstForm(id,m.kind);
 }
 
@@ -1466,6 +1541,40 @@ function openInstForm(id,kind){
   });
 }
 
+/* -------- فورم المصروف / التحويش -------- */
+function openExpForm(id,kind){
+  const m=id? vault.money.find(x=>x.id===id) : null;
+  const isSav=kind==='saving';
+  openSheet(m?(isSav?t('savEdit'):t('expEdit')):(isSav?t('savNew'):t('expNew')),
+    '<label for="e-title">'+(isSav?t('sTitle'):t('eTitle'))+'</label>'+
+    '<input id="e-title" placeholder="'+esc(isSav?t('sTitlePh'):t('eTitlePh'))+'" value="'+esc(m?.title)+'" autocomplete="off">'+
+    '<div class="f-row">'+
+      '<div><label for="e-amount">'+t('mAmount')+'</label><input id="e-amount" type="number" inputmode="decimal" step="any" min="0" class="ltr num" value="'+esc(m?.amount)+'" autocomplete="off"></div>'+
+      '<div><label for="e-cur">'+t('mCur')+'</label><input id="e-cur" value="'+esc(m?m.currency:defCur())+'" autocomplete="off"></div>'+
+    '</div>'+
+    '<label for="e-date">'+t('mDate')+'</label><input id="e-date" type="date" class="ltr num" value="'+esc(m?m.date:todayISO())+'">'+
+    '<label for="e-note">'+t('mNote')+'</label><input id="e-note" value="'+esc(m?.note)+'" autocomplete="off">'+
+    '<button class="btn btn-flame" id="e-save">'+(m?t('saveEdit'):t('save'))+'</button>'+
+    (m?'<button class="btn btn-danger sheet-del" id="e-del">'+ic('trash')+' '+t('delItemBtn')+'</button>':'')
+  );
+  $('#e-save').addEventListener('click',async()=>{
+    const ti=$('#e-title').value.trim();
+    const amount=Number($('#e-amount').value);
+    if(!isSav&&!ti){toast(t('needETitle'));return}
+    if(!amount||amount<=0){toast(t('needAmount'));return}
+    const data={kind,title:ti||(isSav?t('secSav'):''),amount,currency:$('#e-cur').value.trim()||defCur(),date:$('#e-date').value||todayISO(),note:$('#e-note').value.trim()};
+    if(m)Object.assign(m,data);
+    else vault.money.push({id:uid(),createdAt:Date.now(),...data});
+    await persist();closeSheet();renderTab();renderTabs();toast(t('saved'));
+  });
+  if(m)$('#e-del').addEventListener('click',async()=>{
+    const yes=await confirmDlg(t('delPwT',{x:m.title||fmtAmt(Number(m.amount)||0)}),t('delMsg'),{danger:true,yesLabel:t('delBtn')});
+    if(!yes)return;
+    vault.money=vault.money.filter(x=>x.id!==m.id);
+    await persist();closeSheet();renderTab();renderTabs();toast(t('deleted'));
+  });
+}
+
 /* ================= أفعال القوائم ================= */
 $('#content').addEventListener('click',async e=>{
   const b=e.target.closest('[data-act]');if(!b||!vault)return;
@@ -1507,6 +1616,10 @@ $('#content').addEventListener('click',async e=>{
       }
       await persist();renderTab();renderTabs();reminderSync();
     }
+  }
+  else if(act==='toggle-month'){
+    if(expandedMonths.has(id))expandedMonths.delete(id);else expandedMonths.add(id);
+    renderTab();
   }
   else if(act==='chpw')openChangePw();
   else if(act==='export')exportBackup();
