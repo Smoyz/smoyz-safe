@@ -149,6 +149,12 @@ main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap
 }
 .icon-btn:active{background:var(--surface-2);color:var(--ink)}
 .icon-btn svg{width:19px;height:19px}
+.tool-btn{
+  width:46px;height:46px;border-radius:var(--r-lg);flex:none;
+  background:var(--surface);border:1px solid var(--line);color:var(--flame);
+  display:flex;align-items:center;justify-content:center;
+}
+.tool-btn:active{background:var(--surface-2)}
 
 .chip{
   display:inline-flex;align-items:center;padding:3px 9px;border-radius:var(--r-sm);
@@ -406,8 +412,8 @@ details.gen summary svg{width:17px;height:17px}
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='1.8'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=9;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='1.9'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=10;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -460,7 +466,7 @@ ar:{
   fService:'الخدمة', fServicePh:'جوجل، فيسبوك، انستجرام...', fEmail:'الإيميل / اسم المستخدم',
   fPass:'الباسورد', fUrl:'اللينك (اختياري)', fNotes:'ملاحظات (اختياري)',
   needService:'اكتب اسم الخدمة الأول', needPass:'اكتب الباسورد',
-  genTitle:'ولّدلي باسورد قوي', genLen:'الطول', genUpper:'حروف كبيرة A-Z', genDigits:'أرقام 0-9', genSym:'رموز !@#$', genGo:'توليد',
+  genTitle:'ولّدلي باسورد قوي', genToolTitle:'مولّد الباسوردات', genLen:'الطول', genUpper:'حروف كبيرة A-Z', genDigits:'أرقام 0-9', genSym:'رموز !@#$', genGo:'توليد',
   strength:'القوة: ', sWeak:'ضعيفة', sMid:'متوسطة', sStrong:'قوية', sPerfect:'ممتازة 💪',
   delPwT:'مسح "{x}"؟', delMsg:'مش هتقدر ترجّعه تاني.', delBtn:'امسح',
   delPwBtn:'امسح الباسورد ده', delCardBtn:'امسح الكارت ده', delItemBtn:'امسح ده نهائيًا',
@@ -557,7 +563,7 @@ en:{
   fService:'Service', fServicePh:'Google, Facebook, Instagram...', fEmail:'Email / username',
   fPass:'Password', fUrl:'Link (optional)', fNotes:'Notes (optional)',
   needService:'Enter the service name first', needPass:'Enter the password',
-  genTitle:'Generate a strong password', genLen:'Length', genUpper:'Uppercase A-Z', genDigits:'Digits 0-9', genSym:'Symbols !@#$', genGo:'Generate',
+  genTitle:'Generate a strong password', genToolTitle:'Password Generator', genLen:'Length', genUpper:'Uppercase A-Z', genDigits:'Digits 0-9', genSym:'Symbols !@#$', genGo:'Generate',
   strength:'Strength: ', sWeak:'Weak', sMid:'Medium', sStrong:'Strong', sPerfect:'Excellent 💪',
   delPwT:'Delete "{x}"?', delMsg:'This cannot be undone.', delBtn:'Delete',
   delPwBtn:'Delete this password', delCardBtn:'Delete this card', delItemBtn:'Delete permanently',
@@ -1094,10 +1100,41 @@ function renderTab(){
 /* -------- الباسوردات -------- */
 function renderPw(c){
   c.innerHTML=
-    '<div class="search">'+ic('search')+'<input type="search" id="pw-q" placeholder="'+esc(t('searchPh'))+'" autocomplete="off" value="'+esc(pwSearch)+'"></div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<div class="search" style="flex:1">'+ic('search')+'<input type="search" id="pw-q" placeholder="'+esc(t('searchPh'))+'" autocomplete="off" value="'+esc(pwSearch)+'"></div>'+
+      '<button class="tool-btn" id="pw-gen-btn" aria-label="'+esc(t('genToolTitle'))+'">'+ic('dice')+'</button>'+
+    '</div>'+
     '<div id="pw-list" style="display:flex;flex-direction:column;gap:10px"></div>';
   $('#pw-q').addEventListener('input',e=>{pwSearch=e.target.value;renderPwList()});
+  $('#pw-gen-btn').addEventListener('click',openPwGenTool);
   renderPwList();
+}
+
+/* -------- مولّد باسورد مستقل: توليد + نسخ بس، من غير ما يتربط بأي حساب -------- */
+function openPwGenTool(){
+  openSheet(t('genToolTitle'),
+    '<div class="reveal-line"><span class="val mono num ltr" id="pg-val" style="font-size:1.08rem"></span><button class="icon-btn" id="pg-copy" aria-label="'+t('copyPass')+'">'+ic('copy')+'</button></div>'+
+    '<div class="meter"><i id="pg-meter"></i></div><div class="meter-lbl" id="pg-meter-lbl"></div>'+
+    '<div class="gen-row"><span>'+t('genLen')+'</span><input type="range" id="pg-len" min="8" max="32" value="16"><b id="pg-len-v" class="num">16</b></div>'+
+    '<div class="gen-row"><input type="checkbox" id="pg-up" checked><label for="pg-up">'+t('genUpper')+'</label></div>'+
+    '<div class="gen-row"><input type="checkbox" id="pg-dig" checked><label for="pg-dig">'+t('genDigits')+'</label></div>'+
+    '<div class="gen-row"><input type="checkbox" id="pg-sym" checked><label for="pg-sym">'+t('genSym')+'</label></div>'+
+    '<button type="button" class="btn btn-flame" id="pg-go">'+ic('dice')+' '+t('genGo')+'</button>'
+  );
+  const regen=()=>{
+    const pw=genPassword(Number($('#pg-len').value)||16,$('#pg-up').checked,$('#pg-dig').checked,$('#pg-sym').checked);
+    $('#pg-val').textContent=pw;
+    const s=strength(pw);
+    $('#pg-meter').style.width=s.pct+'%';$('#pg-meter').style.background=s.color;
+    $('#pg-meter-lbl').textContent=t('strength')+s.label;
+  };
+  $('#pg-len').addEventListener('input',e=>{$('#pg-len-v').textContent=e.target.value;regen()});
+  $('#pg-up').addEventListener('change',regen);
+  $('#pg-dig').addEventListener('change',regen);
+  $('#pg-sym').addEventListener('change',regen);
+  $('#pg-go').addEventListener('click',regen);
+  $('#pg-copy').addEventListener('click',()=>copyText($('#pg-val').textContent,{sensitive:true,label:t('copiedPass')}));
+  regen();
 }
 function renderPwList(){
   const q=pwSearch.trim().toLowerCase();
