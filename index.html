@@ -193,6 +193,13 @@ main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap
   padding:11px 14px;font-size:.86rem;color:var(--amber);font-weight:600;line-height:1.5;
 }
 .pay-banner svg{width:19px;height:19px;flex:none}
+.upd-banner{
+  display:flex;gap:10px;align-items:center;width:100%;text-align:start;
+  background:rgba(255,91,20,.10);border:1px solid rgba(255,91,20,.45);border-radius:var(--r-lg);
+  padding:11px 14px;font-size:.86rem;color:var(--flame);font-weight:700;line-height:1.5;
+}
+.upd-banner svg{width:19px;height:19px;flex:none}
+.upd-banner:active{background:rgba(255,91,20,.18)}
 .prog{height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden;margin-top:7px}
 .prog i{display:block;height:100%;background:var(--cyan);border-radius:2px}
 .turn-note{color:var(--ok);font-weight:700}
@@ -261,8 +268,10 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 }
 #sheet.on{transform:translate(-50%,0)}
 .sheet-h{display:flex;align-items:center;gap:8px;padding:16px 18px 8px}
-.sheet-h b{flex:1;font-size:1.06rem;font-weight:800}
+.sheet-h b{flex:1;font-size:1.06rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sheet-body{overflow-y:auto;padding:8px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+/* من غير دي بيتضغط المحتوى الطويل بدل ما يعمل تمرير */
+.sheet-body>*{flex:none}
 .sheet-body label{font-size:.83rem;color:var(--muted);margin-bottom:-6px}
 .f-row{display:flex;gap:10px}
 .f-row>*{flex:1}
@@ -270,6 +279,7 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 .seg button{flex:1;padding:9px;border-radius:9px;font-weight:700;font-size:.92rem;color:var(--muted)}
 .seg button.on-pos{background:rgba(69,217,91,.14);color:var(--ok)}
 .seg button.on-neg{background:rgba(242,169,59,.14);color:var(--amber)}
+.seg button.on-vi{background:rgba(166,43,255,.16);color:var(--violet)}
 .type-pick{display:flex;flex-direction:column;gap:10px}
 .type-pick button{
   display:flex;align-items:center;gap:12px;text-align:start;
@@ -279,14 +289,6 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 .type-pick .row-ic{width:38px;height:38px}
 .type-pick b{display:block;font-size:.95rem}
 .type-pick small{color:var(--faint);font-size:.78rem}
-details.gen{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
-details.gen summary{
-  list-style:none;cursor:pointer;padding:11px 14px;font-size:.88rem;font-weight:700;color:var(--muted);
-  display:flex;align-items:center;gap:8px;
-}
-details.gen summary::-webkit-details-marker{display:none}
-details.gen summary svg{width:17px;height:17px}
-.gen-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;font-size:.85rem}
 .gen-row{display:flex;align-items:center;gap:10px;color:var(--muted)}
 .gen-row input[type=range]{flex:1;padding:0;background:none;border:none}
 .gen-row input[type=checkbox]{width:18px;height:18px;padding:0;accent-color:var(--flame)}
@@ -297,6 +299,17 @@ details.gen summary svg{width:17px;height:17px}
   border:1px solid var(--line);border-radius:var(--r-md);padding:11px 14px;
 }
 .reveal-line .val{flex:1;font-size:.95rem;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+/* الأهداف */
+.goal-head{display:flex;gap:10px;align-items:center}
+.goal-head .prog{margin-top:0;flex:1}
+.add-step{display:flex;gap:8px;align-items:center;margin-top:4px}
+.step-t{font-weight:600;white-space:normal;font-size:.94rem;line-height:1.5}
+.step-done .step-t{text-decoration:line-through;opacity:.45}
+/* رسالة الجديد في التحديث */
+.wn-item{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:12px 14px;font-size:.9rem;line-height:1.75;color:var(--ink);
+}
 .reveal-line .lbl{font-size:.75rem;color:var(--faint);flex:none}
 
 #cf-bk{position:fixed;inset:0;background:rgba(5,7,8,.72);z-index:var(--z-confirm-bk);display:none;align-items:center;justify-content:center;padding:26px}
@@ -412,8 +425,8 @@ details.gen summary svg{width:17px;height:17px}
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='1.9'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=10;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='2.0'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=11;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -526,6 +539,17 @@ ar:{
   secNote:'🛡️ <b>إزاي محمي؟</b> كل بياناتك متشفّرة AES-256-GCM بمفتاح مشتق من كلمة سرك (PBKDF2 بـ600 ألف دورة) ومحفوظة على جهازك بس — مفيش سيرفر ولا حساب. الاتصال الوحيد هو فحص التحديثات، ومفيش تثبيت غير لتحديث موقّع رسمي. كلمة سرك ما بتتخزنش في أي مكان.',
   verLine:'Smoyz Safe — إصدار ',
   typedWord:'اكتب: ',
+  tabGoals:'الأهداف',
+  goalsEmpty:'لسه مفيش أهداف.<br>دوس <b>+</b> وحط أول هدف — كورس، مهارة، أي حاجة عايز توصلها',
+  goalNew:'هدف جديد', goalEdit:'تعديل الهدف',
+  goTitle:'الهدف إيه؟', goTitlePh:'كورس React، أذاكر CFA، أتعلم سواقة...',
+  goDiv:'تقسيم النقاط', goDivWeek:'بالأسبوع', goDivMonth:'بالشهر', goDivNone:'من غير تقسيم',
+  goWeekN:'الأسبوع {n}', goMonthN:'الشهر {n}',
+  goAddStep:'اكتب نقطة جديدة...', goStepsProg:'{a}/{b} نقاط',
+  goNeedTitle:'اكتب الهدف الأول', goNoSteps:'لسه مفيش نقاط — ضيف أول نقطة من تحت',
+  goDone:'مبروك! خلّصت الهدف 🎉', goDelBtn:'امسح الهدف ده', goEditBtn:'تعديل بيانات الهدف',
+  whatsNew:'الجديد في إصدار {v} 🎉', whatsNewOk:'تمام، يلا نكمّل',
+  updBanner:'نزل تحديث جديد ({v}) وانت لسه على {c} — دوس هنا تثبته',
   typeExp:'مصروف', typeExpS:'سجّل مصروفاتك وشوف صرفت كام في الشهر',
   typeSav:'تحويش', typeSavS:'سجّل اللي بتحوّشه وتابع مجموعه',
   expNew:'مصروف جديد', expEdit:'تعديل مصروف', savNew:'تحويش جديد', savEdit:'تعديل تحويش',
@@ -624,6 +648,17 @@ en:{
   secNote:'🛡️ <b>How is it protected?</b> Everything is encrypted with AES-256-GCM using a key derived from your password (PBKDF2, 600k rounds) and stored only on your device — no server, no accounts. The only connection is the update check, and nothing installs unless officially signed. Your password is never stored anywhere.',
   verLine:'Smoyz Safe — version ',
   typedWord:'Type: ',
+  tabGoals:'Goals',
+  goalsEmpty:'No goals yet.<br>Tap <b>+</b> to add your first — a course, a skill, anything you want to reach',
+  goalNew:'New goal', goalEdit:'Edit goal',
+  goTitle:'What is the goal?', goTitlePh:'React course, study CFA, learn to drive...',
+  goDiv:'Split the steps', goDivWeek:'By week', goDivMonth:'By month', goDivNone:'No split',
+  goWeekN:'Week {n}', goMonthN:'Month {n}',
+  goAddStep:'Type a new step...', goStepsProg:'{a}/{b} steps',
+  goNeedTitle:'Enter the goal first', goNoSteps:'No steps yet — add the first one below',
+  goDone:'Done! Goal complete 🎉', goDelBtn:'Delete this goal', goEditBtn:'Edit goal details',
+  whatsNew:"What's new in {v} 🎉", whatsNewOk:'Got it',
+  updBanner:'Update {v} is out — you are still on {c}. Tap to install',
   typeExp:'Expense', typeExpS:'Track spending and see monthly totals',
   typeSav:'Savings', typeSavS:'Record what you put aside and watch it grow',
   expNew:'New expense', expEdit:'Edit expense', savNew:'New saving', savEdit:'Edit saving',
@@ -689,6 +724,7 @@ const P={
   globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13.4 13.4 0 0 1 0 18 13.4 13.4 0 0 1 0-18z"/>',
   finger:'<path d="M7 19.5c-1.2-2-2-4.2-2-6.5a7 7 0 0 1 14 0c0 1.2-.1 2.4-.4 3.5"/><path d="M12 9.5a3.5 3.5 0 0 1 3.5 3.5c0 2.6.4 4.6 1 6.5"/><path d="M12 13v3.5c0 1.8.3 3.3.8 4.5"/><path d="M8.5 13a3.5 3.5 0 0 1 3.5-3.5"/>',
   bag:'<path d="M6.5 8h11l-1 12.5h-9L6.5 8z"/><path d="M9 8a3 3 0 0 1 6 0"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6"/>',
   save:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3.5 9l2.2-4h12.6l2.2 4"/><path d="M10 14.5h4"/>'
 };
 const ic=n=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
@@ -730,7 +766,7 @@ let lastActivity=Date.now();
 let hiddenAt=null;
 let expandedMonths=new Set();
 
-const emptyVault=()=>({passwords:[],cards:[],money:[],settings:{autolockMin:3,lastExport:0}});
+const emptyVault=()=>({passwords:[],cards:[],money:[],goals:[],settings:{autolockMin:3,lastExport:0}});
 
 async function persist(){
   if(!vault||!cryptoKey) return;
@@ -953,6 +989,7 @@ async function unlockWith(pw,fromBio){
     vault=await decryptVault(key,blob);
     cryptoKey=key;
     if(!vault.settings)vault.settings={autolockMin:3,lastExport:0};
+    if(!vault.goals)vault.goals=[];
     vault.money.forEach(m=>{if(!m.kind)m.kind='debt'});
     saveGuard({n:0,until:0});
     $('#lk-pw').value='';
@@ -1012,11 +1049,12 @@ const TABS=[
   {id:'pw',key:'tabPw',icon:'key'},
   {id:'cards',key:'tabCards',icon:'card'},
   {id:'money',key:'tabMoney',icon:'cash'},
+  {id:'goals',key:'tabGoals',icon:'target'},
   {id:'set',key:'tabSet',icon:'sliders'},
 ];
 function needBackup(){
   if(!vault)return false;
-  const items=vault.passwords.length+vault.cards.length+vault.money.length;
+  const items=vault.passwords.length+vault.cards.length+vault.money.length+(vault.goals?vault.goals.length:0);
   const last=(vault.settings&&vault.settings.lastExport)||0;
   return items>0&&(Date.now()-last>30*24*3600*1000);
 }
@@ -1048,7 +1086,12 @@ window.__khaznaUpdateState=async o=>{
   if(st==='checking'){if(el&&!silent)el.textContent=t('updChecking');return}
   if(st==='available'){
     updSilent=false;updAvailable=info;
-    if(vault){renderTabs();if(currentTab==='set')renderTab()}
+    if(vault){
+      /* بيتحفظ عشان البانر يفضل ظاهر حتى لو قفل التطبيق وفتحه تاني */
+      vault.settings.updAvail={v:info,code:Number(o.code)||(APP_VCODE+1)};
+      await persist();
+      renderTabs();renderTab();
+    }
     const yes=await confirmDlg(t('updT'),t('updMsg',{v:info,c:APP_VERSION}),{yesLabel:t('updGo')});
     if(yes&&window.Khazna)window.Khazna.installUpdate();
     return;
@@ -1073,9 +1116,46 @@ function openMain(){
   currentTab='pw';
   show('#scr-main');
   $('#scr-main').classList.add('fade-in');
+  /* تحديث اتعرف عليه قبل كده ولسه متثبتش → فضل منبّه */
+  const ua=vault.settings&&vault.settings.updAvail;
+  if(ua&&Number(ua.code)>APP_VCODE)updAvailable=ua.v;
+  else if(ua){updAvailable=null;delete vault.settings.updAvail;persist()}
   renderTabs();renderTab();
   maybeAutoCheckUpdate();
   reminderSync();
+  maybeWhatsNew();
+}
+
+/* ================= الجديد في التحديث ================= */
+const CHANGELOG={
+  '2.0':{
+    ar:['🎯 قسم جديد للأهداف — حط هدفك (كورس، مهارة، أي حاجة) وقسّمه نقط بالأسبوع أو بالشهر، وعلّم على كل نقطة تخلّصها وشوف نسبة إنجازك',
+        '✨ أول ما ينزل أي تحديث هتلاقي رسالة زي دي بتقولك الجديد فيه بالظبط',
+        '🔔 لو نزل تحديث وانت لسه على نسخة قديمة هيفضل تنبيه ظاهر لحد ما تثبته',
+        '🎲 زرار "ولّدلي باسورد قوي" جوه صفحة الحساب اتصلّح — بقى بضغطة واحدة يملا الخانة على طول بدل ما كان مستخبي'],
+    en:['🎯 New Goals section — add a goal (a course, a skill, anything), split it into steps by week or month, tick off each one and watch your progress',
+        '✨ Whenever an update lands, a note like this tells you exactly what changed',
+        '🔔 If an update is out while you are on an older version, a reminder stays visible until you install it',
+        '🎲 Fixed the "generate a strong password" button inside a login — one tap now fills the field instead of opening a hidden panel']
+  }
+};
+const LS_SEEN='smoyz.safe.seenver';
+function maybeWhatsNew(){
+  let seen=null;
+  try{seen=localStorage.getItem(LS_SEEN)}catch(e){}
+  if(seen===APP_VERSION)return;
+  try{localStorage.setItem(LS_SEEN,APP_VERSION)}catch(e){}
+  if(!seen)return; /* تثبيت جديد — مفيش "جديد" يتعرض */
+  const entry=CHANGELOG[APP_VERSION];
+  const items=entry&&(entry[lang]||entry.ar);
+  if(!items||!items.length)return;
+  setTimeout(()=>{
+    if(!vault)return;
+    openSheet(t('whatsNew',{v:APP_VERSION}),
+      items.map(x=>'<div class="wn-item">'+esc(x)+'</div>').join('')+
+      '<button class="btn btn-flame" id="wn-ok">'+t('whatsNewOk')+'</button>');
+    $('#wn-ok').addEventListener('click',closeSheet);
+  },700);
 }
 $('#tabs').addEventListener('click',e=>{
   const b=e.target.closest('[data-tab]');if(!b)return;
@@ -1085,6 +1165,7 @@ $('#fab').addEventListener('click',()=>{
   if(currentTab==='pw')openPwForm();
   else if(currentTab==='cards')openCardForm();
   else if(currentTab==='money')openMoneyPicker();
+  else if(currentTab==='goals')openGoalForm();
 });
 
 function renderTab(){
@@ -1094,7 +1175,148 @@ function renderTab(){
   if(currentTab==='pw')renderPw(c);
   else if(currentTab==='cards')renderCards(c);
   else if(currentTab==='money')renderMoney(c);
+  else if(currentTab==='goals')renderGoals(c);
   else renderSettings(c);
+  /* بانر التحديث فوق أي تبويب — مايروحش غير لما يتثبت */
+  if(updAvailable&&window.Khazna&&window.Khazna.installUpdate){
+    const b=document.createElement('button');
+    b.className='upd-banner';
+    b.innerHTML=ic('down')+'<span>'+esc(t('updBanner',{v:updAvailable,c:APP_VERSION}))+'</span>';
+    b.addEventListener('click',()=>{try{window.Khazna.installUpdate()}catch(e){}});
+    c.insertBefore(b,c.firstChild);
+  }
+}
+
+/* ================= الأهداف ================= */
+const goalPct=g=>g.steps.length? Math.round(g.steps.filter(s=>s.done).length/g.steps.length*100):0;
+const goalComplete=g=>g.steps.length>0&&g.steps.every(s=>s.done);
+function bucketLabel(g,n){return g.div==='month'? t('goMonthN',{n}) : t('goWeekN',{n})}
+function nextBucket(g){
+  if(!g.steps.length)return 1;
+  return Math.max.apply(null,g.steps.map(s=>Number(s.bucket)||1));
+}
+function renderGoals(c){
+  if(!vault.goals.length){
+    c.innerHTML='<div class="empty">'+ic('target')+'<span>'+t('goalsEmpty')+'</span></div>';
+    return;
+  }
+  const list=[...vault.goals].sort((a,b)=>(goalComplete(a)?1:0)-(goalComplete(b)?1:0)||(b.createdAt||0)-(a.createdAt||0));
+  c.innerHTML=list.map(g=>{
+    const pct=goalPct(g), dn=g.steps.filter(s=>s.done).length;
+    return '<div class="row'+(goalComplete(g)?' settled':'')+'" data-act="open-goal" data-id="'+g.id+'">'+
+      '<div class="row-ic vi">'+ic('target')+'</div>'+
+      '<div class="row-main"><div class="row-t">'+esc(g.title)+'</div>'+
+      '<div class="row-s">'+t('goStepsProg',{a:dn,b:g.steps.length})+(g.div!=='none'?' · '+(g.div==='month'?t('goDivMonth'):t('goDivWeek')):'')+(g.note?' · '+esc(g.note):'')+'</div>'+
+      '<div class="prog"><i style="width:'+pct+'%;background:'+(pct===100?'var(--ok)':'var(--violet)')+'"></i></div></div>'+
+      '<span class="num" style="font-size:.92rem;font-weight:800;color:'+(pct===100?'var(--ok)':'var(--muted)')+'">'+pct+'%</span>'+
+    '</div>';
+  }).join('');
+}
+
+/* شاشة الهدف: النقط + علّم على اللي خلص + ضيف نقطة */
+function openGoalView(id){
+  const g=vault.goals.find(x=>x.id===id);if(!g)return;
+  openSheet(g.title,'');
+  paintGoal(g);
+}
+function stepRow(s){
+  return '<div class="row'+(s.done?' step-done':'')+'" style="padding:10px 12px">'+
+    '<button class="icon-btn settle-btn'+(s.done?' done':'')+'" data-gact="toggle" data-gid="'+s.id+'">'+ic('check')+'</button>'+
+    '<div class="row-main"><div class="step-t">'+esc(s.text)+'</div></div>'+
+    '<button class="icon-btn" data-gact="del" data-gid="'+s.id+'">'+ic('trash')+'</button>'+
+  '</div>';
+}
+function paintGoal(g){
+  const pct=goalPct(g), dn=g.steps.filter(s=>s.done).length;
+  let html='<div class="goal-head">'+
+    '<div class="prog"><i style="width:'+pct+'%;background:'+(pct===100?'var(--ok)':'var(--violet)')+'"></i></div>'+
+    '<b class="num" style="color:'+(pct===100?'var(--ok)':'var(--violet)')+'">'+dn+'/'+g.steps.length+'</b></div>';
+  if(!g.steps.length){
+    html+='<div class="sec-note" style="text-align:center">'+t('goNoSteps')+'</div>';
+  }else if(g.div==='none'){
+    html+=g.steps.map(stepRow).join('');
+  }else{
+    const buckets=[...new Set(g.steps.map(s=>Number(s.bucket)||1))].sort((a,b)=>a-b);
+    buckets.forEach(b=>{
+      html+='<div class="sec-h">'+ic('cal')+bucketLabel(g,b)+'</div>';
+      html+=g.steps.filter(s=>(Number(s.bucket)||1)===b).map(stepRow).join('');
+    });
+  }
+  html+='<div class="add-step">'+
+    '<input id="gs-text" placeholder="'+esc(t('goAddStep'))+'" autocomplete="off" style="flex:1">'+
+    (g.div!=='none'?'<input id="gs-bucket" type="number" inputmode="numeric" min="1" max="99" class="ltr num" value="'+nextBucket(g)+'" style="width:62px;flex:none;padding:12px 8px;text-align:center">':'')+
+    '<button class="tool-btn" id="gs-add">'+ic('plus')+'</button>'+
+  '</div>'+
+  '<button class="btn btn-ghost" id="g-edit">'+ic('sliders')+' '+t('goEditBtn')+'</button>';
+  $('#sheet-body').innerHTML=html;
+
+  $('#sheet-body').querySelectorAll('[data-gact="toggle"]').forEach(b=>b.addEventListener('click',async()=>{
+    const s=g.steps.find(x=>x.id===b.dataset.gid);if(!s)return;
+    s.done=!s.done;
+    await persist();
+    const done=goalComplete(g);
+    paintGoal(g);renderTab();renderTabs();
+    if(done&&s.done)toast(t('goDone'));
+  }));
+  $('#sheet-body').querySelectorAll('[data-gact="del"]').forEach(b=>b.addEventListener('click',async()=>{
+    g.steps=g.steps.filter(x=>x.id!==b.dataset.gid);
+    await persist();paintGoal(g);renderTab();
+  }));
+  const addStep=async()=>{
+    const el=$('#gs-text'), txt=el.value.trim();
+    if(!txt)return;
+    const bkEl=$('#gs-bucket');
+    const bk=bkEl? Math.min(99,Math.max(1,Number(bkEl.value)||1)) : 1;
+    g.steps.push({id:uid(),text:txt,done:false,bucket:bk});
+    await persist();paintGoal(g);renderTab();renderTabs();
+    const n=$('#gs-text');if(n)n.focus();
+  };
+  $('#gs-add').addEventListener('click',addStep);
+  $('#gs-text').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addStep()}});
+  $('#g-edit').addEventListener('click',()=>openGoalForm(g.id));
+}
+
+/* فورم بيانات الهدف */
+function openGoalForm(id){
+  const g=id? vault.goals.find(x=>x.id===id) : null;
+  let dv=g?g.div:'week';
+  openSheet(g?t('goalEdit'):t('goalNew'),
+    '<label for="go-title">'+t('goTitle')+'</label>'+
+    '<input id="go-title" placeholder="'+esc(t('goTitlePh'))+'" value="'+esc(g?.title)+'" autocomplete="off">'+
+    '<label>'+t('goDiv')+'</label>'+
+    '<div class="seg" id="go-seg">'+
+      '<button type="button" data-div="week">'+t('goDivWeek')+'</button>'+
+      '<button type="button" data-div="month">'+t('goDivMonth')+'</button>'+
+      '<button type="button" data-div="none">'+t('goDivNone')+'</button>'+
+    '</div>'+
+    '<label for="go-note">'+t('mNote')+'</label><input id="go-note" value="'+esc(g?.note)+'" autocomplete="off">'+
+    '<button class="btn btn-flame" id="go-save">'+(g?t('saveEdit'):t('save'))+'</button>'+
+    (g?'<button class="btn btn-danger sheet-del" id="go-del">'+ic('trash')+' '+t('goDelBtn')+'</button>':'')
+  );
+  const seg=$('#go-seg');
+  const paintSeg=()=>seg.querySelectorAll('button').forEach(b=>{b.className=(b.dataset.div===dv)?'on-vi':''});
+  paintSeg();
+  seg.addEventListener('click',e=>{const b=e.target.closest('[data-div]');if(b){dv=b.dataset.div;paintSeg()}});
+  $('#go-save').addEventListener('click',async()=>{
+    const ti=$('#go-title').value.trim();
+    if(!ti){toast(t('goNeedTitle'));return}
+    const data={title:ti,div:dv,note:$('#go-note').value.trim()};
+    if(g){
+      Object.assign(g,data);
+      await persist();closeSheet();renderTab();renderTabs();toast(t('saved'));
+    }else{
+      const ng={id:uid(),createdAt:Date.now(),steps:[],...data};
+      vault.goals.push(ng);
+      await persist();renderTab();renderTabs();toast(t('saved'));
+      openGoalView(ng.id); // يفتح على طول عشان يضيف النقط
+    }
+  });
+  if(g)$('#go-del').addEventListener('click',async()=>{
+    const yes=await confirmDlg(t('delPwT',{x:g.title}),t('delMsg'),{danger:true,yesLabel:t('delBtn')});
+    if(!yes)return;
+    vault.goals=vault.goals.filter(x=>x.id!==g.id);
+    await persist();closeSheet();renderTab();renderTabs();toast(t('deleted'));
+  });
 }
 
 /* -------- الباسوردات -------- */
@@ -1364,13 +1586,7 @@ function openPwForm(id){
     '<label for="f-pass">'+t('fPass')+'</label>'+
     '<div class="field"><input id="f-pass" type="password" class="ltr mono" value="'+esc(p?.password)+'" autocomplete="off" autocapitalize="off" spellcheck="false">'+peekBtn('f-pass')+'</div>'+
     '<div class="meter"><i id="f-meter"></i></div><div class="meter-lbl" id="f-meter-lbl"></div>'+
-    '<details class="gen"><summary>'+ic('dice')+' '+t('genTitle')+'</summary><div class="gen-body">'+
-      '<div class="gen-row"><span>'+t('genLen')+'</span><input type="range" id="g-len" min="8" max="32" value="16"><b id="g-len-v" class="num">16</b></div>'+
-      '<div class="gen-row"><input type="checkbox" id="g-up" checked><label for="g-up">'+t('genUpper')+'</label></div>'+
-      '<div class="gen-row"><input type="checkbox" id="g-dig" checked><label for="g-dig">'+t('genDigits')+'</label></div>'+
-      '<div class="gen-row"><input type="checkbox" id="g-sym" checked><label for="g-sym">'+t('genSym')+'</label></div>'+
-      '<button type="button" class="btn btn-ghost" id="g-go" style="padding:10px">'+ic('dice')+' '+t('genGo')+'</button>'+
-    '</div></details>'+
+    '<button type="button" class="btn btn-ghost" id="f-gen">'+ic('dice')+' '+t('genTitle')+'</button>'+
     '<label for="f-url">'+t('fUrl')+'</label><input id="f-url" class="ltr" placeholder="https://..." value="'+esc(p?.url)+'" autocomplete="off" autocapitalize="off">'+
     '<label for="f-notes">'+t('fNotes')+'</label><textarea id="f-notes" rows="2">'+esc(p?.notes)+'</textarea>'+
     '<button class="btn btn-flame" id="f-save">'+(p?t('saveEdit'):t('save'))+'</button>'+
@@ -1383,10 +1599,12 @@ function openPwForm(id){
     $('#f-meter-lbl').textContent=passInp.value?t('strength')+s.label:'';
   };
   passInp.addEventListener('input',updMeter);updMeter();
-  $('#g-len').addEventListener('input',e=>$('#g-len-v').textContent=e.target.value);
-  $('#g-go').addEventListener('click',()=>{
+  /* ضغطة واحدة = باسورد قوي جاهز في الخانة وظاهر قدامك */
+  $('#f-gen').addEventListener('click',()=>{
+    passInp.value=genPassword(16,true,true,true);
     passInp.type='text';
-    passInp.value=genPassword(Number($('#g-len').value),$('#g-up').checked,$('#g-dig').checked,$('#g-sym').checked);
+    const pk=document.querySelector('[data-peek="f-pass"]');
+    if(pk)pk.innerHTML=ic('eyeoff');
     updMeter();
   });
   $('#f-save').addEventListener('click',async()=>{
@@ -1631,6 +1849,7 @@ $('#content').addEventListener('click',async e=>{
     if(c2)copyText(c2.number,{sensitive:true,label:t('copiedNum')});
   }
   else if(act==='open-money')openMoneyEdit(id);
+  else if(act==='open-goal')openGoalView(id);
   else if(act==='settle'){
     const m=vault.money.find(x=>x.id===id);
     if(m){m.settled=!m.settled;await persist();renderTab();renderTabs();toast(m.settled?t('settledDone'):t('settledBack'))}
