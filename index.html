@@ -426,8 +426,8 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='2.1'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=12;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='2.2'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=13;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -556,6 +556,8 @@ ar:{
   goNeedTitle:'اكتب الهدف الأول', goNoSteps:'لسه مفيش نقاط — ضيف أول نقطة من تحت',
   goDone:'مبروك! خلّصت الهدف 🎉', goDelBtn:'امسح الهدف ده', goEditBtn:'تعديل بيانات الهدف',
   whatsNew:'الجديد في إصدار {v} 🎉', whatsNewOk:'تمام، يلا نكمّل',
+  exitT:'الخروج من التطبيق', exitMsg:'متأكد إنك عايز تخرج من Smoyz Safe؟',
+  exitMsgLock:'متأكد إنك عايز تخرج؟ الخزنة هتتقفل ومحتاجة كلمة السر أو البصمة تاني.', exitBtn:'خروج',
   updBanner:'نزل تحديث جديد ({v}) وانت لسه على {c} — دوس هنا تثبته',
   typeExp:'مصروف', typeExpS:'سجّل مصروفاتك وشوف صرفت كام في الشهر',
   typeSav:'تحويش', typeSavS:'سجّل اللي بتحوّشه وتابع مجموعه',
@@ -671,6 +673,8 @@ en:{
   goNeedTitle:'Enter the goal first', goNoSteps:'No steps yet — add the first one below',
   goDone:'Done! Goal complete 🎉', goDelBtn:'Delete this goal', goEditBtn:'Edit goal details',
   whatsNew:"What's new in {v} 🎉", whatsNewOk:'Got it',
+  exitT:'Exit the app', exitMsg:'Are you sure you want to exit Smoyz Safe?',
+  exitMsgLock:'Are you sure you want to exit? The vault will lock and need your password or fingerprint again.', exitBtn:'Exit',
   updBanner:'Update {v} is out — you are still on {c}. Tap to install',
   typeExp:'Expense', typeExpS:'Track spending and see monthly totals',
   typeSav:'Savings', typeSavS:'Record what you put aside and watch it grow',
@@ -1081,6 +1085,20 @@ window.__khaznaResume=()=>{
   if(autoLockIfIdle())return;
   if(vault&&currentTab==='set')renderTab(); /* حالة الإشعارات ممكن تكون اتغيرت من إعدادات الموبايل */
 };
+/* زرار الرجوع في أندرويد: يقفل اللي مفتوح الأول، ومن الشاشة الرئيسية يسأل قبل الخروج.
+   بيرجّع 'handled' لو اتصرف، أو 'exit' عشان أندرويد يقفل التطبيق */
+window.__khaznaBack=()=>{
+  try{
+    if($('#cf-bk').classList.contains('on')){$('#cf-no').click();return 'handled'}
+    if($('#sheet').classList.contains('on')){closeSheet();return 'handled'}
+    confirmDlg(t('exitT'),vault?t('exitMsgLock'):t('exitMsg'),{yesLabel:t('exitBtn')}).then(yes=>{
+      if(!yes)return;
+      if(vault)lock();
+      try{window.Khazna.exitApp()}catch(e){}
+    });
+    return 'handled';
+  }catch(e){return 'exit'}
+};
 
 /* -------- الرئيسية -------- */
 const TABS=[
@@ -1203,6 +1221,12 @@ function openMain(){
 
 /* ================= الجديد في التحديث ================= */
 const CHANGELOG={
+  '2.2':{
+    ar:['↩️ زرار الرجوع بقى بيقفل الخانة أو النافذة المفتوحة (تعديل إيميل، كارت، قسط...) بدل ما يخرّجك من التطبيق',
+        '🚪 ولما تكون في الشاشة الرئيسية بيسألك الأول لو متأكد إنك عايز تخرج — والخروج بيقفل الخزنة'],
+    en:['↩️ The back button now closes the open form or window (editing a login, card, installment...) instead of leaving the app',
+        '🚪 From the main screen it asks before exiting — and exiting locks the vault']
+  },
   '2.1':{
     ar:['🔒 القفل التلقائي بقى بعد 10 دقايق من غير استخدام — سواء التطبيق مفتوح قدامك أو خرجت منه — واتصلّحت مشكلة كانت بتخليه مايقفلش لما ترجعله وتلمس الشاشة',
         '📅 في الأقساط والجمعيات بقيت تحدد شهر أول قسط — لو ضفت قسط في شهر 7 ومعاده أول 8، مش هيتحسب عليك غير في 8، وبيوريك آخر قسط هيبقى إمتى ولو في أقساط متأخرة',
