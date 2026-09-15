@@ -203,6 +203,7 @@ main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap
 .prog{height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden;margin-top:7px}
 .prog i{display:block;height:100%;background:var(--cyan);border-radius:2px}
 .turn-note{color:var(--ok);font-weight:700}
+.late-note{color:var(--danger);font-weight:700}
 
 .empty{
   text-align:center;color:var(--faint);padding:56px 24px;display:flex;flex-direction:column;
@@ -425,8 +426,8 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='2.0'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=11;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='2.1'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=12;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -511,7 +512,13 @@ ar:{
   secDebts:'الديون', secInst:'الأقساط', secGam:'الجمعيات',
   payBanner:'فاضل {n} مستحقات الشهر ده — متنساش تدفعهم',
   setLang:'اللغة / Language', setLangS:'بتطبق فورًا على كل التطبيق',
-  setLock:'القفل التلقائي', setLockS:'يقفل لوحده بعد فترة خمول', mins:'دقايق',
+  setLock:'القفل التلقائي', setLockS:'يقفل لوحده لو مستخدمتوش المدة دي — جوه التطبيق أو برّه', mins:'دقايق',
+  iStart:'أول قسط مستحق في شهر', gStart:'الجمعية بتبدأ شهر', needStart:'اختار شهر أول قسط',
+  startsOn:'يبدأ {m}', lateN:'متأخر {n}', endHint:'آخر قسط: {m}', payoutHint:'استلامك: {m}',
+  setNotif:'إشعارات الأقساط', notifOn:'شغّالة ✓ — تذكير يوم ميعاد كل قسط وأول الشهر', notifOff:'مقفولة — دوس هنا عشان تفعّلها',
+  notifTest:'جرّب إشعار دلوقتي', notifTestS:'لو ظهر فوق في الإشعارات يبقى كله تمام', notifTestSent:'اتبعت — بص فوق في الإشعارات',
+  notifBg:'السماح بالعمل في الخلفية', notifBgOn:'مسموح ✓ — التذكير هيوصل حتى والتطبيق مقفول', notifBgOff:'دوس واختار "سماح" عشان التذكير يوصل والتطبيق مقفول',
+  notifOemNote:'💡 على موبايلات شاومي وأوبو وريلمي وإنفينكس: فعّل كمان "التشغيل التلقائي" (Autostart) لـ Smoyz Safe من إعدادات الموبايل، وإلا النظام ممكن يمنع التذكير.',
   setBio:'الدخول بالبصمة', setBioOn:'مفعّلة — بتفتح بيها وتقدر تسترجع كلمة السر', setBioOff:'اضغط للتفعيل — أسرع، وخط نجاة لو نسيت كلمة السر',
   setBioNA:'البصمة مش متاحة على الجهاز ده',
   bioEnableT:'تفعيل الدخول بالبصمة', bioEnableMsg:'اكتب كلمة السر الرئيسية مرة واحدة — هتتحفظ مشفّرة جوه شريحة الأمان بتاعة الموبايل ومتتفتحش غير ببصمتك.',
@@ -620,7 +627,13 @@ en:{
   secDebts:'Debts', secInst:'Installments', secGam:'Savings circles',
   payBanner:'{n} payment(s) due this month — do not forget',
   setLang:'Language / اللغة', setLangS:'Applies instantly to the whole app',
-  setLock:'Auto-lock', setLockS:'Locks by itself when idle', mins:'min',
+  setLock:'Auto-lock', setLockS:'Locks after this long without use — inside the app or away from it', mins:'min',
+  iStart:'First payment month', gStart:'Circle starts in', needStart:'Pick the first payment month',
+  startsOn:'starts {m}', lateN:'{n} overdue', endHint:'Last payment: {m}', payoutHint:'Your payout: {m}',
+  setNotif:'Payment notifications', notifOn:'On ✓ — reminded on each due day and at the start of the month', notifOff:'Off — tap to enable',
+  notifTest:'Send a test notification', notifTestS:'If it shows up in your notification shade, all good', notifTestSent:'Sent — check your notification shade',
+  notifBg:'Allow background activity', notifBgOn:'Allowed ✓ — reminders arrive even when the app is closed', notifBgOff:'Tap and choose "Allow" so reminders arrive while the app is closed',
+  notifOemNote:'💡 On Xiaomi, Oppo, Realme and Infinix phones, also turn on "Autostart" for Smoyz Safe in phone settings, or the system may block reminders.',
   setBio:'Fingerprint unlock', setBioOn:'Enabled — unlock with it, also your password lifeline', setBioOff:'Tap to enable — faster, and a lifeline if you forget the password',
   setBioNA:'Biometrics not available on this device',
   bioEnableT:'Enable fingerprint unlock', bioEnableMsg:'Type your master password once — it will be stored encrypted inside the phone security chip and can only be opened with your fingerprint.',
@@ -763,10 +776,9 @@ let cryptoKey=null;
 let currentTab='pw';
 let pwSearch='';
 let lastActivity=Date.now();
-let hiddenAt=null;
 let expandedMonths=new Set();
 
-const emptyVault=()=>({passwords:[],cards:[],money:[],goals:[],settings:{autolockMin:3,lastExport:0}});
+const emptyVault=()=>({passwords:[],cards:[],money:[],goals:[],settings:{autolockMin:10,lockV2:true,lastExport:0}});
 
 async function persist(){
   if(!vault||!cryptoKey) return;
@@ -875,6 +887,11 @@ function monthKey(){
   const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
 }
+/* حساب الشهور: YYYY-MM ⇄ رقم متسلسل */
+function ymIndex(ym){const p=String(ym||'').split('-');return (Number(p[0])||0)*12+((Number(p[1])||1)-1)}
+function ymFromIndex(i){return Math.floor(i/12)+'-'+String(i%12+1).padStart(2,'0')}
+function addMonths(ym,n){return ymFromIndex(ymIndex(ym)+n)}
+const isYm=s=>/^\d{4}-\d{2}$/.test(String(s||''));
 function fmtMonth(k){
   try{return new Date(k+'-01T00:00:00').toLocaleDateString(lang==='ar'?'ar-EG':'en-GB',{month:'long',year:'numeric'})}
   catch(e){return k}
@@ -988,9 +1005,26 @@ async function unlockWith(pw,fromBio){
     const key=await deriveKey(pw,b64Buf(blob.kdf.salt),blob.kdf.iter);
     vault=await decryptVault(key,blob);
     cryptoKey=key;
-    if(!vault.settings)vault.settings={autolockMin:3,lastExport:0};
+    if(!vault.settings)vault.settings={autolockMin:10,lockV2:true,lastExport:0};
     if(!vault.goals)vault.goals=[];
     vault.money.forEach(m=>{if(!m.kind)m.kind='debt'});
+    let migrated=false;
+    /* القفل الافتراضي بقى 10 دقايق (كان 3) */
+    if(!vault.settings.lockV2){
+      if(!vault.settings.autolockMin||vault.settings.autolockMin===3)vault.settings.autolockMin=10;
+      vault.settings.lockV2=true;migrated=true;
+    }
+    /* أقساط قديمة من غير "شهر أول قسط": نستنتجه بحيث حالتها الحالية ماتتغيرش */
+    const mkNow=monthKey();
+    vault.money.forEach(m=>{
+      if((m.kind==='installment'||m.kind==='gamiya')&&!isYm(m.startMonth)){
+        const paid=Number(m.monthsPaid)||0;
+        const curIdx=(m.lastPaidMonth===mkNow)? Math.max(1,paid) : paid+1;
+        m.startMonth=addMonths(mkNow,-(curIdx-1));
+        migrated=true;
+      }
+    });
+    if(migrated){try{await persist()}catch(e){}}
     saveGuard({n:0,until:0});
     $('#lk-pw').value='';
     btn.disabled=false;btn.textContent=t('lkBtn');
@@ -1029,20 +1063,24 @@ function lock(){
 }
 $('#btn-lock').addEventListener('click',()=>{lock();toast(t('locked'))});
 
-['pointerdown','keydown','touchstart','input'].forEach(ev=>
-  document.addEventListener(ev,()=>{lastActivity=Date.now()},{passive:true}));
-setInterval(()=>{
-  if(!vault)return;
-  const mins=(vault.settings&&vault.settings.autolockMin)||3;
-  if(Date.now()-lastActivity>mins*60000){lock();toast(t('lockedAuto'))}
-},10000);
-document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){hiddenAt=Date.now()}
-  else{
-    if(vault&&hiddenAt&&Date.now()-hiddenAt>60000){lock();toast(t('lockedAuto'))}
-    hiddenAt=null;
-  }
-});
+/* القفل التلقائي: X دقيقة من غير استخدام — جوه التطبيق أو برّه.
+   أول لمسة بعد غياب طويل بتقفل الأول قبل ما تتحسب نشاط (وإلا كانت بتصفّر العداد والتطبيق يفضل مفتوح) */
+const idleLimitMs=()=>((vault&&vault.settings&&vault.settings.autolockMin)||10)*60000;
+const idleExpired=()=>!!vault&&(Date.now()-lastActivity>idleLimitMs());
+function autoLockIfIdle(){
+  if(!idleExpired())return false;
+  lock();toast(t('lockedAuto'));
+  return true;
+}
+['pointerdown','keydown','touchstart','input','wheel'].forEach(ev=>
+  document.addEventListener(ev,()=>{if(!autoLockIfIdle())lastActivity=Date.now()},{passive:true,capture:true}));
+setInterval(autoLockIfIdle,5000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoLockIfIdle()});
+/* أندرويد بينده دي لما التطبيق يرجع قدامك — أضمن من visibilitychange جوه الـWebView */
+window.__khaznaResume=()=>{
+  if(autoLockIfIdle())return;
+  if(vault&&currentTab==='set')renderTab(); /* حالة الإشعارات ممكن تكون اتغيرت من إعدادات الموبايل */
+};
 
 /* -------- الرئيسية -------- */
 const TABS=[
@@ -1058,14 +1096,50 @@ function needBackup(){
   const last=(vault.settings&&vault.settings.lastExport)||0;
   return items>0&&(Date.now()-last>30*24*3600*1000);
 }
+/* حالة القسط/الجمعية في الشهر الحالي، محسوبة من شهر أول قسط:
+   idx = رقم القسط المستحق الشهر ده (أقل من 1 = لسه مابدأش) */
+function instState(m){
+  const total=Number(m.monthsTotal)||0, paid=Number(m.monthsPaid)||0;
+  const idx=isYm(m.startMonth)? ymIndex(monthKey())-ymIndex(m.startMonth)+1 : paid+1;
+  const upcoming=idx<1;
+  const covered=upcoming? paid>=1 : paid>=Math.min(idx,total);
+  const overdue=upcoming? 0 : Math.max(0,Math.min(idx-1,total)-paid);
+  return {idx,paid,total,upcoming,covered,overdue};
+}
 function pendingPayments(){
   if(!vault)return 0;
-  const mk=monthKey();
-  return vault.money.filter(m=>(m.kind==='installment'||m.kind==='gamiya')&&!m.settled&&m.lastPaidMonth!==mk).length;
+  return vault.money.filter(m=>{
+    if((m.kind!=='installment'&&m.kind!=='gamiya')||m.settled)return false;
+    const s=instState(m);
+    return !s.upcoming&&!s.covered;
+  }).length;
+}
+/* تواريخ الأقساط الجاية اللي لسه متدفعتش (سنة لقدام) — بتتبعت لأندرويد
+   عشان المنبّه يفكّر في ميعادها بالظبط حتى والتطبيق مقفول */
+function dueDatesAhead(){
+  if(!vault)return [];
+  const today=todayISO(), horizon=ymIndex(monthKey())+13, out=[];
+  vault.money.forEach(m=>{
+    if((m.kind!=='installment'&&m.kind!=='gamiya')||m.settled||!isYm(m.startMonth))return;
+    const total=Number(m.monthsTotal)||0, paid=Number(m.monthsPaid)||0, start=ymIndex(m.startMonth);
+    for(let n=paid+1;n<=total;n++){
+      const mi=start+n-1;
+      if(mi>horizon)break;
+      const y=Math.floor(mi/12), mo=mi%12+1;
+      const day=Math.min(new Date(y,mo,0).getDate(),Math.max(1,Number(m.dueDay)||1));
+      const d=ymFromIndex(mi)+'-'+String(day).padStart(2,'0');
+      if(d>=today)out.push(d);
+    }
+  });
+  return [...new Set(out)].sort().slice(0,400);
 }
 function reminderSync(){
-  if(!window.Khazna||!window.Khazna.setMonthlyReminder)return;
-  try{window.Khazna.setMonthlyReminder(pendingPayments()>0,lang)}catch(e){}
+  if(!window.Khazna||!vault)return;
+  const now=pendingPayments()>0;
+  try{
+    if(window.Khazna.setReminderPlan)window.Khazna.setReminderPlan(dueDatesAhead().join(','),now,lang);
+    else if(window.Khazna.setMonthlyReminder)window.Khazna.setMonthlyReminder(now,lang);
+  }catch(e){}
 }
 
 /* ---- التحديثات ---- */
@@ -1114,6 +1188,7 @@ function renderTabs(){
 }
 function openMain(){
   currentTab='pw';
+  lastActivity=Date.now(); /* الفتح بالبصمة مافيهوش كتابة، فلازم نبدأ العداد من هنا */
   show('#scr-main');
   $('#scr-main').classList.add('fade-in');
   /* تحديث اتعرف عليه قبل كده ولسه متثبتش → فضل منبّه */
@@ -1128,6 +1203,14 @@ function openMain(){
 
 /* ================= الجديد في التحديث ================= */
 const CHANGELOG={
+  '2.1':{
+    ar:['🔒 القفل التلقائي بقى بعد 10 دقايق من غير استخدام — سواء التطبيق مفتوح قدامك أو خرجت منه — واتصلّحت مشكلة كانت بتخليه مايقفلش لما ترجعله وتلمس الشاشة',
+        '📅 في الأقساط والجمعيات بقيت تحدد شهر أول قسط — لو ضفت قسط في شهر 7 ومعاده أول 8، مش هيتحسب عليك غير في 8، وبيوريك آخر قسط هيبقى إمتى ولو في أقساط متأخرة',
+        '🔔 اتصلّح تذكير الأقساط: بقى بيوصل والتطبيق مقفول يوم ميعاد كل قسط وأول الشهر — ومن الإعدادات تقدر تبعت إشعار تجربة وتتأكد إنه شغال على موبايلك'],
+    en:['🔒 Auto-lock now kicks in after 10 minutes without use — with the app open or after leaving it — and fixed a bug that kept it unlocked when you came back and touched the screen',
+        '📅 Installments and savings circles now have a first-payment month — add one in July that is due on Aug 1 and it only counts from August, plus it shows your last payment and anything overdue',
+        '🔔 Fixed payment reminders: they now arrive while the app is closed, on each due day and at the start of the month — and Settings has a button to send a test notification']
+  },
   '2.0':{
     ar:['🎯 قسم جديد للأهداف — حط هدفك (كورس، مهارة، أي حاجة) وقسّمه نقط بالأسبوع أو بالشهر، وعلّم على كل نقطة تخلّصها وشوف نسبة إنجازك',
         '✨ أول ما ينزل أي تحديث هتلاقي رسالة زي دي بتقولك الجديد فيه بالظبط',
@@ -1410,18 +1493,18 @@ function moneyTotals(){
   return tt;
 }
 function instRow(m){
-  const mk=monthKey();
-  const paidThis=m.lastPaidMonth===mk;
+  const s=instState(m);
   const isGam=m.kind==='gamiya';
-  const cycle=(m.monthsPaid||0)+1;
-  const turn=isGam&&!m.settled&&cycle===Number(m.myTurn||0);
-  const pct=Math.min(100,Math.round(((m.monthsPaid||0)/(m.monthsTotal||1))*100));
+  const turn=isGam&&!m.settled&&!s.upcoming&&s.idx===Number(m.myTurn||0);
+  const pct=Math.min(100,Math.round((s.paid/(s.total||1))*100));
   let sub=esc(m.funder||'')+(m.funder?' · ':'')+fmtAmt(Number(m.monthly)||0)+' '+esc(m.currency||defCur())+t('perMonth')+
-    ' · '+t('monthsProg',{a:m.monthsPaid||0,b:m.monthsTotal||0})+
-    (m.dueDay?' · '+t('dueDayS',{n:m.dueDay}):'');
+    ' · '+t('monthsProg',{a:s.paid,b:s.total});
+  if(s.upcoming&&!m.settled)sub+=' · '+t('startsOn',{m:esc(fmtMonth(m.startMonth))});
+  else if(m.dueDay)sub+=' · '+t('dueDayS',{n:m.dueDay});
+  if(s.overdue>0&&!m.settled)sub+=' · <span class="late-note">'+t('lateN',{n:s.overdue})+'</span>';
   if(turn)sub+=' · <span class="turn-note">'+t('turnNow')+'</span>';
   return '<div class="row'+(m.settled?' settled':'')+'" data-act="open-money" data-id="'+m.id+'">'+
-    '<button class="icon-btn settle-btn'+(paidThis?' done':'')+'" data-act="pay-month" data-id="'+m.id+'" aria-label="'+t('payThis')+'">'+ic('check')+'</button>'+
+    '<button class="icon-btn settle-btn'+(s.covered?' done':'')+'" data-act="pay-month" data-id="'+m.id+'" aria-label="'+t('payThis')+'">'+ic('check')+'</button>'+
     '<div class="row-main"><div class="row-t">'+esc(m.title)+'</div>'+
     '<div class="row-s">'+sub+'</div>'+
     '<div class="prog"><i style="width:'+pct+'%"></i></div></div>'+
@@ -1516,6 +1599,20 @@ function renderSettings(c){
   const s=vault.settings;
   const lastEx=s.lastExport? t('setExportS1')+new Date(s.lastExport).toLocaleDateString(lang==='ar'?'ar-EG':'en-GB'):t('setExportS0');
   const bio=bioStatus();
+  /* إعدادات الإشعارات (نسخة الأندرويد بس) */
+  let notifGroup='';
+  if(window.Khazna&&window.Khazna.notifStatus){
+    let ns='granted',bs='exempt';
+    try{ns=window.Khazna.notifStatus()}catch(e){}
+    try{bs=window.Khazna.batteryStatus()}catch(e){}
+    const warn=' style="color:var(--amber)"';
+    notifGroup='<div class="set-group">'+
+      '<button class="set-item" data-act="notif">'+ic('bell')+'<div class="txt"><b>'+t('setNotif')+'</b><small'+(ns==='granted'?'':warn)+'>'+(ns==='granted'?t('notifOn'):t('notifOff'))+'</small></div></button>'+
+      '<button class="set-item" data-act="notif-test">'+ic('bell')+'<div class="txt"><b>'+t('notifTest')+'</b><small>'+t('notifTestS')+'</small></div></button>'+
+      '<button class="set-item" data-act="notif-bg">'+ic('clock')+'<div class="txt"><b>'+t('notifBg')+'</b><small'+(bs==='exempt'?'':warn)+'>'+(bs==='exempt'?t('notifBgOn'):t('notifBgOff'))+'</small></div></button>'+
+    '</div>'+
+    '<div class="sec-note">'+t('notifOemNote')+'</div>';
+  }
   let bioRow='';
   if(window.Khazna&&bio!=='unavailable'){
     bioRow='<button class="set-item" data-act="bio">'+ic('finger')+'<div class="txt"><b>'+t('setBio')+'</b><small>'+
@@ -1527,10 +1624,11 @@ function renderSettings(c){
       '<div class="set-item">'+ic('globe')+'<div class="txt"><b>'+t('setLang')+'</b><small>'+t('setLangS')+'</small></div>'+
         '<select id="set-lang"><option value="ar"'+(lang==='ar'?' selected':'')+'>العربية</option><option value="en"'+(lang==='en'?' selected':'')+'>English</option></select></div>'+
       '<div class="set-item">'+ic('clock')+'<div class="txt"><b>'+t('setLock')+'</b><small>'+t('setLockS')+'</small></div>'+
-        '<select id="set-autolock">'+[1,3,5,10].map(m=>'<option value="'+m+'"'+(s.autolockMin===m?' selected':'')+'>'+m+' '+t('mins')+'</option>').join('')+'</select></div>'+
+        '<select id="set-autolock">'+[1,3,5,10,15,30].map(m=>'<option value="'+m+'"'+((s.autolockMin||10)===m?' selected':'')+'>'+m+' '+t('mins')+'</option>').join('')+'</select></div>'+
       bioRow+
       '<button class="set-item" data-act="chpw">'+ic('key')+'<div class="txt"><b>'+t('setChpw')+'</b><small>'+t('setChpwS')+'</small></div></button>'+
     '</div>'+
+    notifGroup+
     '<div class="set-group">'+
       '<button class="set-item" data-act="export">'+ic('down')+'<div class="txt"><b>'+t('setExport')+'</b><small>'+esc(lastEx)+t('setExportS2')+'</small></div></button>'+
       '<button class="set-item" data-act="import">'+ic('up')+'<div class="txt"><b>'+t('setImport')+'</b><small>'+t('setImportS')+'</small></div></button>'+
@@ -1757,6 +1855,9 @@ function openInstForm(id,kind){
       '<div><label for="i-months">'+t('iMonths')+'</label><input id="i-months" type="number" inputmode="numeric" min="1" max="240" class="ltr num" value="'+esc(m?.monthsTotal)+'" autocomplete="off"></div>'+
       '<div><label for="i-due">'+t('iDueDay')+'</label><input id="i-due" type="number" inputmode="numeric" min="1" max="31" class="ltr num" value="'+esc(m?m.dueDay:1)+'" autocomplete="off"></div>'+
     '</div>'+
+    '<label for="i-start">'+(isGam?t('gStart'):t('iStart'))+'</label>'+
+    '<input id="i-start" type="month" class="ltr num" value="'+esc(m&&isYm(m.startMonth)?m.startMonth:addMonths(monthKey(),1))+'">'+
+    '<div class="meter-lbl" id="i-end" style="margin-top:-6px"></div>'+
     '<div class="f-row">'+
       (isGam?'<div><label for="i-turn">'+t('gTurn')+'</label><input id="i-turn" type="number" inputmode="numeric" min="1" max="240" class="ltr num" value="'+esc(m?.myTurn)+'" autocomplete="off"></div>':'')+
       '<div><label for="i-paid">'+t('iPaid')+'</label><input id="i-paid" type="number" inputmode="numeric" min="0" max="240" class="ltr num" value="'+esc(m?m.monthsPaid:0)+'" autocomplete="off"></div>'+
@@ -1765,27 +1866,44 @@ function openInstForm(id,kind){
     '<button class="btn btn-flame" id="i-save">'+(m?t('saveEdit'):t('save'))+'</button>'+
     (m?'<button class="btn btn-danger sheet-del" id="i-del">'+ic('trash')+' '+t('delItemBtn')+'</button>':'')
   );
+  /* آخر قسط (وميعاد استلام الجمعية) بيتحسب قدامه وهو بيكتب */
+  const updEnd=()=>{
+    const el=$('#i-end');if(!el)return;
+    const st=$('#i-start').value, mt=Number($('#i-months').value)||0;
+    if(!isYm(st)||mt<1){el.textContent='';return}
+    let txt=t('endHint',{m:fmtMonth(addMonths(st,mt-1))});
+    const tu=$('#i-turn');
+    if(tu&&Number(tu.value)>=1)txt=t('payoutHint',{m:fmtMonth(addMonths(st,Number(tu.value)-1))})+' · '+txt;
+    el.textContent=txt;
+  };
+  ['#i-start','#i-months','#i-turn'].forEach(sel=>{
+    const el=$(sel);if(!el)return;
+    el.addEventListener('input',updEnd);el.addEventListener('change',updEnd);
+  });
+  updEnd();
   $('#i-save').addEventListener('click',async()=>{
     const ti=$('#i-title').value.trim();
     const monthly=Number($('#i-monthly').value);
     const monthsTotal=Number($('#i-months').value);
+    const startMonth=$('#i-start').value;
     if(!ti){toast(t('needITitle'));return}
     if(!isGam&&!$('#i-funder').value.trim()){toast(t('needIFunder'));return}
     if(!monthly||monthly<=0){toast(t('needMonthly'));return}
     if(!monthsTotal||monthsTotal<1){toast(t('needMonths'));return}
+    if(!isYm(startMonth)){toast(t('needStart'));return}
     const monthsPaid=Math.max(0,Number($('#i-paid').value)||0);
     const data={
       kind, title:ti,
       funder:isGam?'':$('#i-funder').value.trim(),
       monthly, currency:$('#i-cur').value.trim()||defCur(),
-      monthsTotal, monthsPaid,
+      monthsTotal, monthsPaid, startMonth,
       dueDay:Math.min(31,Math.max(1,Number($('#i-due').value)||1)),
       myTurn:isGam?Math.max(1,Number($('#i-turn').value)||1):null,
       note:$('#i-note').value.trim(),
       settled:monthsPaid>=monthsTotal
     };
     if(m)Object.assign(m,data);
-    else vault.money.push({id:uid(),lastPaidMonth:null,createdAt:Date.now(),...data});
+    else vault.money.push({id:uid(),createdAt:Date.now(),...data});
     await persist();closeSheet();renderTab();renderTabs();reminderSync();toast(t('saved'));
   });
   if(m)$('#i-del').addEventListener('click',async()=>{
@@ -1857,14 +1975,13 @@ $('#content').addEventListener('click',async e=>{
   else if(act==='pay-month'){
     const m=vault.money.find(x=>x.id===id);
     if(m){
-      const mk=monthKey();
-      if(m.lastPaidMonth===mk){
-        m.monthsPaid=Math.max(0,(m.monthsPaid||0)-1);
-        m.lastPaidMonth=null;
+      const s=instState(m);
+      if(s.covered){
+        /* تراجع عن آخر دفعة */
+        m.monthsPaid=Math.max(0,s.paid-1);
         m.settled=false;
       }else{
-        m.monthsPaid=(m.monthsPaid||0)+1;
-        m.lastPaidMonth=mk;
+        m.monthsPaid=Math.min(s.total||s.paid+1,s.paid+1);
         if(m.monthsPaid>=m.monthsTotal){
           m.settled=true;
           toast(m.kind==='gamiya'?t('gamDone'):t('instDone'));
@@ -1882,6 +1999,14 @@ $('#content').addEventListener('click',async e=>{
   else if(act==='import')importBackup(false);
   else if(act==='erase')eraseAll();
   else if(act==='bio')bioToggle();
+  else if(act==='notif'){try{window.Khazna.openNotifSettings()}catch(e){}}
+  else if(act==='notif-test'){
+    let ns='granted';try{ns=window.Khazna.notifStatus()}catch(e){}
+    if(ns!=='granted'){toast(t('notifOff'));try{window.Khazna.openNotifSettings()}catch(e){}return}
+    try{window.Khazna.testNotification(lang)}catch(e){}
+    toast(t('notifTestSent'));
+  }
+  else if(act==='notif-bg'){try{window.Khazna.requestBatteryExempt()}catch(e){}}
   else if(act==='checkupd'){
     const u=updUrl();
     if(!u){toast(t('updNoUrl'));return}
