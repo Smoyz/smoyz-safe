@@ -187,6 +187,35 @@ main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap
   margin:8px 4px -2px;display:flex;align-items:center;gap:7px;
 }
 .sec-h svg{width:15px;height:15px}
+.sec-act{
+  margin-inline-start:auto;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;
+  border:1px solid rgba(255,91,20,.45);background:rgba(255,91,20,.10);color:var(--flame);font-size:.78rem;font-weight:700;
+}
+.sec-act:active{background:rgba(255,91,20,.2)}
+/* تذكير السلف: اختيار + معاينة الرسائل */
+.dr-person,.dr-item{display:flex;align-items:center;gap:12px;cursor:pointer;border-radius:var(--r-md);padding:10px 12px}
+.dr-person{background:var(--surface-2);border:1px solid var(--line);margin-top:6px}
+.dr-item{padding-inline-start:26px}
+.dr-item:active,.dr-person:active{background:var(--surface-2)}
+.dr-check{
+  width:26px;height:26px;border-radius:8px;border:1.5px solid var(--border-strong);
+  display:grid;place-items:center;flex:none;color:transparent;
+}
+.dr-check svg{width:16px;height:16px}
+.on>.dr-check{background:var(--flame);border-color:var(--flame);color:var(--on-flame)}
+.dr-main{flex:1;min-width:0}
+.dr-name{font-weight:800;font-size:.98rem}
+.dr-sub{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dr-amt{font-weight:800;color:var(--ok);font-size:.95rem;flex:none}
+.dr-msg{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;display:flex;flex-direction:column;gap:10px}
+.dr-msg.sent{opacity:.6}
+.dr-msg-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dr-sent{color:var(--ok);font-weight:700;font-size:.85rem}
+.dr-text{
+  white-space:pre-wrap;font-family:inherit;font-size:.88rem;line-height:1.75;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:12px;margin:0;
+  max-height:230px;overflow:auto;text-align:start;
+}
 .pay-banner{
   display:flex;gap:10px;align-items:center;
   background:rgba(242,169,59,.10);border:1px solid rgba(242,169,59,.4);border-radius:var(--r-lg);
@@ -426,8 +455,8 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='2.2'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=13;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='2.3'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=14;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -558,6 +587,17 @@ ar:{
   whatsNew:'الجديد في إصدار {v} 🎉', whatsNewOk:'تمام، يلا نكمّل',
   exitT:'الخروج من التطبيق', exitMsg:'متأكد إنك عايز تخرج من Smoyz Safe؟',
   exitMsgLock:'متأكد إنك عايز تخرج؟ الخزنة هتتقفل ومحتاجة كلمة السر أو البصمة تاني.', exitBtn:'خروج',
+  drBtn:'ابعت تذكير', drTitle:'تذكير بالفلوس اللي ليك',
+  drHint:'اختار السلف اللي عايز تفكّر بيها — دوس على اسم الشخص يختار كل سلفه. هيتعمل رسالة جاهزة لكل شخص.',
+  drAllBtn:'تحديد الكل', drNoneBtn:'إلغاء التحديد', drGo:'جهّز الرسائل ({n})',
+  drNone:'مفيش فلوس ليك مفتوحة عند حد دلوقتي',
+  drPreview1:'تذكير لـ {x}', drPreviewN:'رسائل التذكير ({n})',
+  drMulti:'اخترت {n} أشخاص — كل واحد ليه رسالة لوحده. دوس "ابعت" على كل رسالة واختار الشخص في واتساب.',
+  drCombined:'أو ابعتهم كلهم في رسالة واحدة (لجروب مثلًا)',
+  drSend:'ابعت', drCopy:'نسخ', drDone:'✓ تم', drCopiedPaste:'اتنسخت — الصقها في واتساب',
+  drRemindThis:'ابعت تذكير لـ {x}', drReminded:'اتفكّر {d}', drItems:'{n} سلف',
+  msgHi:'أهلًا {x} 👋', msgOne:'تذكير بسيط بالمبلغ اللي عليك:', msgMany:'تذكير بسيط بالمبالغ اللي عليك:',
+  msgTotal:'الإجمالي: {v}', msgThanks:'شكرًا 🙏', msgGroupHead:'تذكير بالمبالغ المطلوبة 👋',
   updBanner:'نزل تحديث جديد ({v}) وانت لسه على {c} — دوس هنا تثبته',
   typeExp:'مصروف', typeExpS:'سجّل مصروفاتك وشوف صرفت كام في الشهر',
   typeSav:'تحويش', typeSavS:'سجّل اللي بتحوّشه وتابع مجموعه',
@@ -675,6 +715,17 @@ en:{
   whatsNew:"What's new in {v} 🎉", whatsNewOk:'Got it',
   exitT:'Exit the app', exitMsg:'Are you sure you want to exit Smoyz Safe?',
   exitMsgLock:'Are you sure you want to exit? The vault will lock and need your password or fingerprint again.', exitBtn:'Exit',
+  drBtn:'Send reminder', drTitle:'Remind people what they owe you',
+  drHint:'Pick the debts to remind about — tap a name to pick all of theirs. Each person gets a ready message.',
+  drAllBtn:'Select all', drNoneBtn:'Clear selection', drGo:'Prepare messages ({n})',
+  drNone:'Nobody owes you anything right now',
+  drPreview1:'Reminder for {x}', drPreviewN:'Reminder messages ({n})',
+  drMulti:'You picked {n} people — each gets their own message. Tap "Send" on each one and pick the person in WhatsApp.',
+  drCombined:'Or send them all in one message (e.g. to a group)',
+  drSend:'Send', drCopy:'Copy', drDone:'✓ Done', drCopiedPaste:'Copied — paste it in WhatsApp',
+  drRemindThis:'Send {x} a reminder', drReminded:'reminded {d}', drItems:'{n} debts',
+  msgHi:'Hi {x} 👋', msgOne:'A friendly reminder of what you owe:', msgMany:'A friendly reminder of what you owe:',
+  msgTotal:'Total: {v}', msgThanks:'Thanks 🙏', msgGroupHead:'A friendly reminder of what is owed 👋',
   updBanner:'Update {v} is out — you are still on {c}. Tap to install',
   typeExp:'Expense', typeExpS:'Track spending and see monthly totals',
   typeSav:'Savings', typeSavS:'Record what you put aside and watch it grow',
@@ -742,6 +793,7 @@ const P={
   finger:'<path d="M7 19.5c-1.2-2-2-4.2-2-6.5a7 7 0 0 1 14 0c0 1.2-.1 2.4-.4 3.5"/><path d="M12 9.5a3.5 3.5 0 0 1 3.5 3.5c0 2.6.4 4.6 1 6.5"/><path d="M12 13v3.5c0 1.8.3 3.3.8 4.5"/><path d="M8.5 13a3.5 3.5 0 0 1 3.5-3.5"/>',
   bag:'<path d="M6.5 8h11l-1 12.5h-9L6.5 8z"/><path d="M9 8a3 3 0 0 1 6 0"/>',
   target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6"/>',
+  share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>',
   save:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3.5 9l2.2-4h12.6l2.2 4"/><path d="M10 14.5h4"/>'
 };
 const ic=n=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
@@ -1221,6 +1273,14 @@ function openMain(){
 
 /* ================= الجديد في التحديث ================= */
 const CHANGELOG={
+  '2.3':{
+    ar:['📤 تذكير بالسلف: من قسم الديون دوس "ابعت تذكير"، اختار سلفة أو أكتر — أو دوس على اسم الشخص يختار كل سلفه — والتطبيق يجهّز رسالة مرتبة فيها المبالغ والتواريخ والإجمالي تبعتها واتساب على طول',
+        '👥 لو اخترت كذا شخص، كل واحد بتطلعله رسالته لوحده — أو تبعتهم كلهم في رسالة واحدة لجروب',
+        '🕓 كل سلفة بقى مكتوب جنبها آخر مرة فكّرت صاحبها بيها'],
+    en:['📤 Debt reminders: in the debts section tap "Send reminder", pick one debt or more — or tap a name to pick all of theirs — and the app writes a tidy message with amounts, dates and the total, ready to send on WhatsApp',
+        '👥 Pick several people and each gets their own message — or send them all in one message to a group',
+        '🕓 Each debt now shows when you last reminded the person']
+  },
   '2.2':{
     ar:['↩️ زرار الرجوع بقى بيقفل الخانة أو النافذة المفتوحة (تعديل إيميل، كارت، قسط...) بدل ما يخرّجك من التطبيق',
         '🚪 ولما تكون في الشاشة الرئيسية بيسألك الأول لو متأكد إنك عايز تخرج — والخروج بيقفل الخزنة'],
@@ -1605,12 +1665,16 @@ function renderMoney(c){
     html+=savs.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(savRow).join('');
   }
   if(debts.length){
-    html+='<div class="sec-h">'+ic('cash')+t('secDebts')+'</div>'+debts.map(m=>{
+    const canRemind=debts.some(m=>m.dir==='lya'&&!m.settled);
+    html+='<div class="sec-h">'+ic('cash')+t('secDebts')+
+      (canRemind?'<button class="sec-act" data-act="debt-remind">'+ic('share')+t('drBtn')+'</button>':'')+
+    '</div>'+debts.map(m=>{
       const pos=m.dir==='lya';
       return '<div class="row'+(m.settled?' settled':'')+'" data-act="open-money" data-id="'+m.id+'">'+
         '<button class="icon-btn settle-btn'+(m.settled?' done':'')+'" data-act="settle" data-id="'+m.id+'" aria-label="'+t('settledDone')+'">'+ic('check')+'</button>'+
         '<div class="row-main"><div class="row-t">'+esc(m.person)+'</div>'+
-        '<div class="row-s">'+(pos?t('forYou'):t('youOwe'))+(m.date?' · '+fmtDate(m.date):'')+(m.note?' · '+esc(m.note):'')+'</div></div>'+
+        '<div class="row-s">'+(pos?t('forYou'):t('youOwe'))+(m.date?' · '+fmtDate(m.date):'')+(m.note?' · '+esc(m.note):'')+
+          (pos&&!m.settled&&m.remindedAt?' · '+t('drReminded',{d:fmtDate(m.remindedAt)}):'')+'</div></div>'+
         '<span class="num '+(pos?'amt-pos':'amt-neg')+'" style="font-size:1.02rem">'+(pos?'':'−')+fmtAmt(Number(m.amount)||0)+' <small style="font-weight:400;font-size:.72rem">'+esc(m.currency||defCur())+'</small></span>'+
       '</div>';
     }).join('');
@@ -1816,6 +1880,146 @@ function openMoneyEdit(id){
   else openInstForm(id,m.kind);
 }
 
+/* -------- تذكير السلف: اختيار سلفة أو أكتر → رسالة جاهزة لكل شخص -------- */
+function groupByPerson(items){
+  const map=new Map();
+  items.forEach(m=>{
+    const name=String(m.person||'').trim(), k=name.toLowerCase();
+    if(!map.has(k))map.set(k,{name,items:[]});
+    map.get(k).items.push(m);
+  });
+  return [...map.values()].map(g=>({name:g.name,items:g.items.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''))}));
+}
+function debtTotalsStr(items){
+  const tot={};
+  items.forEach(m=>{const cu=m.currency||defCur();tot[cu]=(tot[cu]||0)+(Number(m.amount)||0)});
+  return Object.keys(tot).map(cu=>fmtAmt(tot[cu])+' '+cu).join(' + ');
+}
+function debtLine(m){
+  return '• '+fmtAmt(Number(m.amount)||0)+' '+(m.currency||defCur())+
+    (m.note?' — '+m.note:'')+(m.date?' ('+fmtDate(m.date)+')':'');
+}
+function debtReminderText(g){
+  return t('msgHi',{x:g.name})+'\n'+
+    (g.items.length>1?t('msgMany'):t('msgOne'))+'\n\n'+
+    g.items.map(debtLine).join('\n')+
+    (g.items.length>1?'\n\n'+t('msgTotal',{v:debtTotalsStr(g.items)}):'')+
+    '\n\n'+t('msgThanks');
+}
+function debtReminderCombined(groups){
+  return t('msgGroupHead')+'\n\n'+
+    groups.map(g=>g.name+':\n'+g.items.map(debtLine).join('\n')+
+      (g.items.length>1?'\n'+t('msgTotal',{v:debtTotalsStr(g.items)}):'')).join('\n\n')+
+    '\n\n'+t('msgThanks');
+}
+/* المشاركة بتسلّم النص لواتساب أو أي تطبيق — التطبيق نفسه مابيتصلش بحاجة */
+async function shareText(txt){
+  if(window.Khazna&&window.Khazna.shareText){
+    try{window.Khazna.shareText(txt,lang);return true}catch(e){}
+  }
+  if(navigator.share){
+    try{await navigator.share({text:txt});return true}
+    catch(e){if(e&&e.name==='AbortError')return false}
+  }
+  await copyText(txt,{label:t('drCopiedPaste')});
+  return true;
+}
+
+function openDebtRemind(){
+  const open=vault.money.filter(m=>m.kind==='debt'&&m.dir==='lya'&&!m.settled);
+  if(!open.length){toast(t('drNone'));return}
+  const groups=groupByPerson(open);
+  const sel=new Set();
+  const paint=()=>{
+    let html='<div class="sec-note" style="padding:0 2px">'+t('drHint')+'</div>'+
+      '<button class="btn btn-ghost" id="dr-all" style="padding:10px">'+(sel.size===open.length?t('drNoneBtn'):t('drAllBtn'))+'</button>';
+    groups.forEach((g,gi)=>{
+      const allOn=g.items.every(m=>sel.has(m.id));
+      html+='<div class="dr-person'+(allOn?' on':'')+'" data-drp="'+gi+'">'+
+        '<span class="dr-check">'+ic('check')+'</span>'+
+        '<div class="dr-main"><div class="dr-name">'+esc(g.name)+'</div>'+
+        (g.items.length>1?'<div class="dr-sub">'+t('drItems',{n:g.items.length})+'</div>':'')+'</div>'+
+        '<span class="dr-amt num">'+esc(debtTotalsStr(g.items))+'</span>'+
+      '</div>';
+      if(g.items.length>1)g.items.forEach(m=>{
+        html+='<div class="dr-item'+(sel.has(m.id)?' on':'')+'" data-dri="'+m.id+'">'+
+          '<span class="dr-check">'+ic('check')+'</span>'+
+          '<div class="dr-main"><div class="dr-sub">'+(m.note?esc(m.note)+' · ':'')+(m.date?fmtDate(m.date):'')+'</div></div>'+
+          '<span class="dr-amt num">'+fmtAmt(Number(m.amount)||0)+' '+esc(m.currency||defCur())+'</span>'+
+        '</div>';
+      });
+    });
+    html+='<button class="btn btn-flame" id="dr-go"'+(sel.size?'':' disabled')+'>'+ic('share')+' '+t('drGo',{n:sel.size})+'</button>';
+    $('#sheet-body').innerHTML=html;
+    $('#dr-all').addEventListener('click',()=>{
+      if(sel.size===open.length)sel.clear();else open.forEach(m=>sel.add(m.id));
+      paint();
+    });
+    $('#sheet-body').querySelectorAll('[data-drp]').forEach(el=>el.addEventListener('click',()=>{
+      const g=groups[Number(el.dataset.drp)];
+      const allOn=g.items.every(m=>sel.has(m.id));
+      g.items.forEach(m=>{if(allOn)sel.delete(m.id);else sel.add(m.id)});
+      paint();
+    }));
+    $('#sheet-body').querySelectorAll('[data-dri]').forEach(el=>el.addEventListener('click',()=>{
+      const id=el.dataset.dri;
+      if(sel.has(id))sel.delete(id);else sel.add(id);
+      paint();
+    }));
+    $('#dr-go').addEventListener('click',()=>{
+      if(!sel.size)return;
+      openDebtRemindPreview(open.filter(m=>sel.has(m.id)));
+    });
+  };
+  openSheet(t('drTitle'),'');
+  paint();
+}
+
+function openDebtRemindPreview(items){
+  const groups=groupByPerson(items);
+  const markReminded=async list=>{
+    const d=todayISO();
+    list.forEach(m=>{m.remindedAt=d});
+    await persist();renderTab();
+  };
+  let html='';
+  if(groups.length>1){
+    html+='<div class="warn-box">'+ic('users')+'<span>'+t('drMulti',{n:groups.length})+'</span></div>'+
+      '<button class="btn btn-ghost" id="dr-combined">'+ic('share')+' '+t('drCombined')+'</button>';
+  }
+  groups.forEach((g,i)=>{
+    html+='<div class="dr-msg" id="dr-msg-'+i+'">'+
+      '<div class="dr-msg-h"><b>'+esc(g.name)+'</b><span class="dr-sent" id="dr-sent-'+i+'"></span></div>'+
+      '<pre class="dr-text">'+esc(debtReminderText(g))+'</pre>'+
+      '<div class="f-row">'+
+        '<button class="btn btn-flame" data-drsend="'+i+'">'+ic('share')+' '+t('drSend')+'</button>'+
+        '<button class="btn btn-ghost" data-drcopy="'+i+'">'+ic('copy')+' '+t('drCopy')+'</button>'+
+      '</div>'+
+    '</div>';
+  });
+  openSheet(groups.length>1?t('drPreviewN',{n:groups.length}):t('drPreview1',{x:groups[0].name}),html);
+  const done=i=>{
+    const box=$('#dr-msg-'+i),lbl=$('#dr-sent-'+i);
+    if(box)box.classList.add('sent');
+    if(lbl)lbl.textContent=t('drDone');
+  };
+  $('#sheet-body').querySelectorAll('[data-drsend]').forEach(b=>b.addEventListener('click',async()=>{
+    const i=Number(b.dataset.drsend), g=groups[i];
+    if(await shareText(debtReminderText(g))){done(i);markReminded(g.items)}
+  }));
+  $('#sheet-body').querySelectorAll('[data-drcopy]').forEach(b=>b.addEventListener('click',()=>{
+    const i=Number(b.dataset.drcopy);
+    copyText(debtReminderText(groups[i]),{label:t('drCopiedPaste')});
+    done(i);markReminded(groups[i].items);
+  }));
+  if($('#dr-combined'))$('#dr-combined').addEventListener('click',async()=>{
+    if(await shareText(debtReminderCombined(groups))){
+      groups.forEach((g,i)=>done(i));
+      markReminded(items);
+    }
+  });
+}
+
 /* -------- فورم الدين -------- */
 function openDebtForm(id){
   const m=id? vault.money.find(x=>x.id===id) : null;
@@ -1833,8 +2037,10 @@ function openDebtForm(id){
     '<label for="m-date">'+t('mDate')+'</label><input id="m-date" type="date" class="ltr num" value="'+esc(m?m.date:todayISO())+'">'+
     '<label for="m-note">'+t('mNote')+'</label><input id="m-note" placeholder="'+esc(t('mNotePh'))+'" value="'+esc(m?.note)+'" autocomplete="off">'+
     '<button class="btn btn-flame" id="m-save">'+(m?t('saveEdit'):t('save'))+'</button>'+
+    (m&&m.dir==='lya'&&!m.settled?'<button class="btn btn-ghost" id="m-remind">'+ic('share')+' '+esc(t('drRemindThis',{x:m.person}))+'</button>':'')+
     (m?'<button class="btn btn-danger sheet-del" id="m-del">'+ic('trash')+' '+t('delItemBtn')+'</button>':'')
   );
+  if($('#m-remind'))$('#m-remind').addEventListener('click',()=>openDebtRemindPreview([m]));
   const seg=$('#m-seg');
   const paintSeg=()=>{
     seg.querySelectorAll('button').forEach(b=>{
@@ -2014,6 +2220,7 @@ $('#content').addEventListener('click',async e=>{
       await persist();renderTab();renderTabs();reminderSync();
     }
   }
+  else if(act==='debt-remind'){openDebtRemind()}
   else if(act==='toggle-month'){
     if(expandedMonths.has(id))expandedMonths.delete(id);else expandedMonths.add(id);
     renderTab();
