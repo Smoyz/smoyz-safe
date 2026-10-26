@@ -481,8 +481,8 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='2.7'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=18;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='2.8'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=19;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -1420,6 +1420,18 @@ function openMain(){
 
 /* ================= الجديد في التحديث ================= */
 const CHANGELOG={
+  '2.8':{
+    ar:['💾 نسخة احتياطية تلقائية كل 30 يوم — من الإعدادات اختار فولدر مرة واحدة، والتطبيق هيحفظ فيه نسخة متشفّرة لوحده (وبيسيب آخر 5 نسخ)',
+        '📍 لما تلصق لينك موقع فيه إحداثيات، المكان بيتحدد لوحده على طول قبل ما تحفظ',
+        '✖️ زرار × في كل خانة كتابة يمسح المكتوب كله بضغطة',
+        '🔤 الكلام العربي بيتعرض من اليمين والإنجليزي من الشمال، كل واحد باتجاهه الصح',
+        '📝 خانة الملاحظات بقت تكبر لفوق وتحت بس — مابقتش تخرج برا الشاشة'],
+    en:['💾 Automatic backup every 30 days — pick a folder once in Settings and the app saves an encrypted copy there by itself (keeping the last 5)',
+        '📍 Paste a map link with coordinates and the place is pinned automatically before you even save',
+        '✖️ An × button in every text field clears it in one tap',
+        '🔤 Arabic text now reads from the right and English from the left, each in its own direction',
+        '📝 The notes box only resizes vertically now — it no longer spills off the screen']
+  },
   '2.6':{
     ar:['🚗 لما تدوس على سهم الملاحة جنب أي مكان، بيسألك تروح بإيه — بيعرضلك تطبيقات الخرايط والنقل المتثبتة على موبايلك (خرايط جوجل، Waze، Uber، inDrive...) وتختار اللي يناسبك',
         '💰 مبلغ قبض الجمعية بقى في سطر لوحده عشان مايتقصّش'],
