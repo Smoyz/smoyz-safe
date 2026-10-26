@@ -49,6 +49,22 @@ input,select,textarea{
   border:1px solid var(--line);border-radius:var(--r-md);
   padding:12px 14px;width:100%;font-size:16px;outline:none;
 }
+/* التكبير لفوق وتحت بس — الأفقي كان بيخرج برا الشاشة */
+textarea{resize:vertical;max-width:100%;min-height:52px;max-height:40vh}
+/* الكلام بياخد اتجاهه من أول حرف فيه: عربي من اليمين، إنجليزي من الشمال */
+input:not(.ltr),textarea:not(.ltr){unicode-bidi:plaintext;text-align:start}
+.row-t,.step-t,.dr-name,.wn-item,.dr-text{unicode-bidi:plaintext}
+/* زرار مسح الكتابة كلها */
+.clr{position:relative;display:block;width:100%}
+.clr>input,.clr>textarea{padding-right:42px}
+.clr-x{
+  position:absolute;top:0;right:0;width:42px;height:48px;
+  display:none;align-items:center;justify-content:center;color:var(--faint);
+}
+.clr-x svg{width:17px;height:17px}
+.clr-x:active{color:var(--ink)}
+.clr.on>.clr-x{display:flex}
+.clr>textarea+.clr-x{height:46px}
 input::placeholder,textarea::placeholder{color:var(--faint)}
 input:focus,select:focus,textarea:focus{border-color:var(--flame);box-shadow:0 0 0 3px rgba(225,89,30,.12)}
 :focus-visible{outline:2px solid var(--flame);outline-offset:2px}
@@ -465,8 +481,8 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='2.6'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=17;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='2.7'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=18;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -626,6 +642,13 @@ ar:{
   plCopyCoords:'انسخ الإحداثيات', plCoordsCopied:'الإحداثيات اتنسخت',
   plRideHint:'هيفتحلك التطبيق والإحداثيات في الكليبورد — الصقها في خانة الوصول',
   plNoApps:'مفيش تطبيقات خرايط متثبتة — انسخ الإحداثيات واستخدمها في أي تطبيق',
+  plFromLink:'الموقع اتاخد من اللينك ✓',
+  plShortLink:'اللينك ده مختصر ومفيهوش إحداثيات. افتحه في خرايط جوجل وانسخ اللينك الطويل، أو دوس "حدد موقعي" وانت في المكان.',
+  clearField:'امسح المكتوب',
+  setAuto:'نسخة احتياطية تلقائية', setAutoOn:'شغّالة ✓ — كل 30 يوم في «{x}»',
+  setAutoOff:'مقفولة — دوس واختار فولدر، وهتتعمل لوحدها كل 30 يوم',
+  autoBkDone:'اتعملت نسخة احتياطية تلقائية ✓', autoBkFail:'النسخة التلقائية فشلت — اختار الفولدر تاني',
+  autoOffT:'إيقاف النسخ التلقائي؟', autoOffMsg:'هترجع تعمل النسخة الاحتياطية بإيدك من الإعدادات.', autoOffBtn:'أوقف',
   plNeedName:'اكتب اسم المكان', plNeedAny:'حدد الموقع أو حط لينك',
   plSavedAt:'اتحفظ {d}', plHasLink:'لينك محفوظ', plNoApp:'مفيش تطبيق خرايط على الموبايل',
   plDelBtn:'امسح المكان ده',
@@ -776,6 +799,13 @@ en:{
   plCopyCoords:'Copy coordinates', plCoordsCopied:'Coordinates copied',
   plRideHint:'Opens the app with the coordinates on your clipboard — paste them into the destination field',
   plNoApps:'No maps app installed — copy the coordinates and use them in any app',
+  plFromLink:'Location taken from the link ✓',
+  plShortLink:'That is a short link with no coordinates in it. Open it in Google Maps and copy the full link, or tap “Pin my location” while you are there.',
+  clearField:'Clear',
+  setAuto:'Automatic backup', setAutoOn:'On ✓ — every 30 days into “{x}”',
+  setAutoOff:'Off — tap to pick a folder and it runs itself every 30 days',
+  autoBkDone:'Automatic backup saved ✓', autoBkFail:'Automatic backup failed — pick the folder again',
+  autoOffT:'Turn off automatic backup?', autoOffMsg:'You will go back to exporting manually from Settings.', autoOffBtn:'Turn off',
   plNeedName:'Enter the place name', plNeedAny:'Pin the location or add a link',
   plSavedAt:'saved {d}', plHasLink:'link saved', plNoApp:'No maps app on this phone',
   plDelBtn:'Delete this place',
@@ -1298,6 +1328,40 @@ function reminderSync(){
 let updAvailable=null;
 let updSilent=false;
 function updUrl(){return ((vault&&vault.settings&&vault.settings.updateUrl)||DEFAULT_UPDATE_URL).trim()}
+/* ---- نسخة احتياطية تلقائية كل 30 يوم ---- */
+const AUTO_BK_DAYS=30;
+function autoBackupFolder(){
+  if(!window.Khazna||!window.Khazna.backupFolder)return null; /* نسخة الويب */
+  try{return window.Khazna.backupFolder()||''}catch(e){return ''}
+}
+window.__khaznaBackupFolder=name=>{
+  if(!vault)return;
+  vault.settings.autoBackup=!!name;
+  if(name)vault.settings.lastAutoBackup=0;
+  persist().then(()=>{
+    if(currentTab==='set')renderTab();
+    if(name)maybeAutoBackup(true);
+  });
+};
+window.__khaznaAutoBackupDone=ok=>{
+  if(!vault)return;
+  if(!ok){toast(t('autoBkFail'));return}
+  const now=Date.now();
+  vault.settings.lastAutoBackup=now;
+  vault.settings.lastExport=now; /* بقى عندك نسخة فعلًا */
+  persist().then(()=>{renderTabs();if(currentTab==='set')renderTab()});
+  toast(t('autoBkDone'));
+};
+function maybeAutoBackup(force){
+  if(!vault||!window.Khazna||!window.Khazna.autoBackup)return;
+  if(!autoBackupFolder())return;
+  const last=vault.settings.lastAutoBackup||0;
+  if(!force&&Date.now()-last<AUTO_BK_DAYS*24*3600*1000)return;
+  const blob=loadBlob();if(!blob)return;
+  const d=new Date();
+  const name='smoyz-safe-auto-'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.json';
+  try{window.Khazna.autoBackup(JSON.stringify(blob),name)}catch(e){}
+}
 function maybeAutoCheckUpdate(){
   if(!window.Khazna||!window.Khazna.checkUpdate||!vault)return;
   const u=updUrl();if(!u)return;
@@ -1350,6 +1414,7 @@ function openMain(){
   renderTabs();renderTab();
   maybeAutoCheckUpdate();
   reminderSync();
+  maybeAutoBackup(false);
   maybeWhatsNew();
 }
 
@@ -1446,6 +1511,7 @@ function renderTab(){
   else if(currentTab==='places')renderPlaces(c);
   else if(currentTab==='goals')renderGoals(c);
   else renderSettings(c);
+  addClearButtons(c);
   /* بانر التحديث فوق أي تبويب — مايروحش غير لما يتثبت */
   if(updAvailable&&window.Khazna&&window.Khazna.installUpdate){
     const b=document.createElement('button');
@@ -1518,6 +1584,7 @@ function paintGoal(g){
   '</div>'+
   '<button class="btn btn-ghost" id="g-edit">'+ic('sliders')+' '+t('goEditBtn')+'</button>';
   $('#sheet-body').innerHTML=html;
+  addClearButtons($('#sheet-body'));
 
   $('#sheet-body').querySelectorAll('[data-gact="toggle"]').forEach(b=>b.addEventListener('click',async()=>{
     const s=g.steps.find(x=>x.id===b.dataset.gid);if(!s)return;
@@ -1816,6 +1883,7 @@ function renderSettings(c){
   const s=vault.settings;
   const lastEx=s.lastExport? t('setExportS1')+new Date(s.lastExport).toLocaleDateString(lang==='ar'?'ar-EG':'en-GB'):t('setExportS0');
   const bio=bioStatus();
+  const abFolder=autoBackupFolder();
   /* إعدادات الإشعارات (نسخة الأندرويد بس) */
   let notifGroup='';
   if(window.Khazna&&window.Khazna.notifStatus){
@@ -1849,6 +1917,8 @@ function renderSettings(c){
     '<div class="set-group">'+
       '<button class="set-item" data-act="export">'+ic('down')+'<div class="txt"><b>'+t('setExport')+'</b><small>'+esc(lastEx)+t('setExportS2')+'</small></div></button>'+
       '<button class="set-item" data-act="import">'+ic('up')+'<div class="txt"><b>'+t('setImport')+'</b><small>'+t('setImportS')+'</small></div></button>'+
+      (abFolder===null?'':'<button class="set-item" data-act="autobk">'+ic('clock')+'<div class="txt"><b>'+t('setAuto')+'</b><small'+(abFolder?'':' style="color:var(--amber)"')+'>'+
+        (abFolder?t('setAutoOn',{x:esc(abFolder)}):t('setAutoOff'))+'</small></div></button>')+
     '</div>'+
     (window.Khazna?
     '<div class="set-group">'+
@@ -1869,9 +1939,34 @@ function renderSettings(c){
 }
 
 /* ================= Sheet ================= */
+/* زرار × في كل خانة كتابة — يمسح المكتوب كله مرة واحدة */
+function addClearButtons(root){
+  if(!root)return;
+  root.querySelectorAll('input[type="text"],input[type="url"],input[type="search"],input[type="email"],input:not([type]),textarea')
+    .forEach(el=>{
+      if(el.closest('.field')||el.closest('.clr'))return; /* خانات الباسورد فيها زرار العين */
+      const w=document.createElement('span');
+      w.className='clr';
+      el.parentNode.insertBefore(w,el);
+      w.appendChild(el);
+      const b=document.createElement('button');
+      b.type='button';b.className='clr-x';b.innerHTML=ic('x');
+      b.setAttribute('aria-label',t('clearField'));
+      w.appendChild(b);
+      const upd=()=>w.classList.toggle('on',!!el.value);
+      el.addEventListener('input',upd);
+      b.addEventListener('click',()=>{
+        el.value='';
+        el.dispatchEvent(new Event('input',{bubbles:true}));
+        upd();el.focus();
+      });
+      upd();
+    });
+}
 function openSheet(title,bodyHTML){
   $('#sheet-title').textContent=title;
   $('#sheet-body').innerHTML=bodyHTML;
+  addClearButtons($('#sheet-body'));
   $('#sheet-bk').classList.add('on');
   $('#sheet').classList.add('on');
 }
@@ -2145,7 +2240,7 @@ function openPlaceForm(id){
     '<div class="meter-lbl" id="pl-coords" style="margin-top:-6px"></div>'+
     '<label for="pl-url">'+t('plUrl')+'</label>'+
     '<input id="pl-url" class="ltr" inputmode="url" placeholder="'+esc(t('plUrlPh'))+'" value="'+esc(p?.url)+'" autocomplete="off" autocapitalize="off" spellcheck="false">'+
-    '<div class="sec-note" style="margin-top:-8px">'+t('plUrlHint')+'</div>'+
+    '<div class="sec-note" id="pl-url-hint" style="margin-top:-8px">'+t('plUrlHint')+'</div>'+
     '<label for="pl-note">'+t('plNote')+'</label>'+
     '<input id="pl-note" placeholder="'+esc(t('plNotePh'))+'" value="'+esc(p?.note)+'" autocomplete="off">'+
     (p?'<button type="button" class="btn btn-ghost" id="pl-open">'+ic('nav')+' '+t('plOpen')+'</button>':'')+
@@ -2153,13 +2248,27 @@ function openPlaceForm(id){
     '<div class="sec-note">🔒 '+t('plPrivacy')+'</div>'+
     (p?'<button class="btn btn-danger sheet-del" id="pl-del">'+ic('trash')+' '+t('plDelBtn')+'</button>':'')
   );
+  let fromLink=false;
   const paint=()=>{
     $('#pl-pin-t').textContent=(lat!==null)?t('plPinAgain'):t('plPin');
     $('#pl-coords').innerHTML=(lat!==null)
-      ? '<span style="color:var(--ok)">'+t('plPinned')+'</span> <span class="ltr num">'+fmtCoord(lat)+', '+fmtCoord(lng)+'</span>'
+      ? '<span style="color:var(--ok)">'+(fromLink?t('plFromLink'):t('plPinned'))+'</span> <span class="ltr num">'+fmtCoord(lat)+', '+fmtCoord(lng)+'</span>'
       : '';
   };
   paint();
+  /* أول ما يلصق لينك فيه إحداثيات، المكان بيتحدد لوحده */
+  $('#pl-url').addEventListener('input',e=>{
+    const v=e.target.value.trim();
+    const c=coordsFromUrl(v);
+    const hint=$('#pl-url-hint');
+    if(c){
+      lat=c.lat;lng=c.lng;fromLink=true;paint();
+      if(hint)hint.textContent=t('plUrlHint');
+    }else if(hint){
+      /* لينك مختصر: مفيش إحداثيات جواه ومش هينفع نفتحه من غير نت */
+      hint.textContent=(v&&/^https?:\/\//i.test(v))? t('plShortLink') : t('plUrlHint');
+    }
+  });
   $('#pl-pin').addEventListener('click',async()=>{
     const btn=$('#pl-pin'),txt=$('#pl-pin-t');
     btn.disabled=true;txt.textContent=t('plPinning');
@@ -2562,6 +2671,17 @@ $('#content').addEventListener('click',async e=>{
     toast(t('notifTestSent'));
   }
   else if(act==='notif-bg'){try{window.Khazna.requestBatteryExempt()}catch(e){}}
+  else if(act==='autobk'){
+    if(autoBackupFolder()){
+      const yes=await confirmDlg(t('autoOffT'),t('autoOffMsg'),{danger:true,yesLabel:t('autoOffBtn')});
+      if(!yes)return;
+      try{window.Khazna.clearBackupFolder()}catch(e){}
+      vault.settings.autoBackup=false;
+      await persist();renderTab();toast(t('saved'));
+    }else{
+      try{window.Khazna.pickBackupFolder()}catch(e){}
+    }
+  }
   else if(act==='checkupd'){
     const u=updUrl();
     if(!u){toast(t('updNoUrl'));return}
