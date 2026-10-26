@@ -241,6 +241,7 @@ main#content{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap
 .prog i{display:block;height:100%;background:var(--cyan);border-radius:2px}
 .turn-note{color:var(--ok);font-weight:700}
 .late-note{color:var(--danger);font-weight:700}
+.row-hi{font-size:.82rem;margin-top:3px;white-space:normal;line-height:1.5}
 
 .empty{
   text-align:center;color:var(--faint);padding:56px 24px;display:flex;flex-direction:column;
@@ -464,8 +465,8 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='2.5'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=16;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='2.6'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=17;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -1354,9 +1355,11 @@ function openMain(){
 
 /* ================= الجديد في التحديث ================= */
 const CHANGELOG={
-  '2.5':{
-    ar:['🚗 لما تدوس على سهم الملاحة جنب أي مكان، بيسألك تروح بإيه — بيعرضلك تطبيقات الخرايط والنقل المتثبتة على موبايلك (خرايط جوجل، Waze، Uber، inDrive...) وتختار اللي يناسبك'],
-    en:['🚗 Tapping the navigate arrow next to a place now asks how you want to get there — it lists the maps and ride apps actually installed on your phone (Google Maps, Waze, Uber, inDrive...) and you pick']
+  '2.6':{
+    ar:['🚗 لما تدوس على سهم الملاحة جنب أي مكان، بيسألك تروح بإيه — بيعرضلك تطبيقات الخرايط والنقل المتثبتة على موبايلك (خرايط جوجل، Waze، Uber، inDrive...) وتختار اللي يناسبك',
+        '💰 مبلغ قبض الجمعية بقى في سطر لوحده عشان مايتقصّش'],
+    en:['🚗 Tapping the navigate arrow next to a place now asks how you want to get there — it lists the maps and ride apps actually installed on your phone (Google Maps, Waze, Uber, inDrive...) and you pick',
+        '💰 The savings-circle payout amount now gets its own line so it is never cut off']
   },
   '2.4':{
     ar:['💰 الجمعية بقت تحسبلك قبضك: أول ما تكتب القسط وعدد الشهور يقولك هتقبض كام (قسط 10 آلاف × 12 شهر = 120 ألف)، ولما ييجي شهر قبضك يفكّرك ويخصم قسط الشهر ويوريك الصافي اللي هيوصلك',
@@ -1696,16 +1699,19 @@ function instRow(m){
     ' · '+t('monthsProg',{a:s.paid,b:s.total});
   if(s.upcoming&&!m.settled)sub+=' · '+t('startsOn',{m:esc(fmtMonth(m.startMonth))});
   else if(m.dueDay)sub+=' · '+t('dueDayS',{n:m.dueDay});
-  if(s.overdue>0&&!m.settled)sub+=' · <span class="late-note">'+t('lateN',{n:s.overdue})+'</span>';
+  /* السطر ده لوحده عشان المبلغ مايتقصّش */
+  let hi='';
+  if(s.overdue>0&&!m.settled)hi+='<span class="late-note">'+t('lateN',{n:s.overdue})+'</span>';
   if(isGam){
     const po=gamPayout(m);
-    if(turn)sub+=' · <span class="turn-note">'+esc(t('gamTurnRow',{n:po.netS}))+'</span>';
+    if(turn)hi+=(hi?' · ':'')+'<span class="turn-note">'+esc(t('gamTurnRow',{n:po.netS}))+'</span>';
     else if(!m.settled&&po.gross>0)sub+=' · '+esc(t('gamPayoutShort',{g:po.grossS}));
   }
+  if(hi)hi='<div class="row-hi">'+hi+'</div>';
   return '<div class="row'+(m.settled?' settled':'')+'" data-act="open-money" data-id="'+m.id+'">'+
     '<button class="icon-btn settle-btn'+(s.covered?' done':'')+'" data-act="pay-month" data-id="'+m.id+'" aria-label="'+t('payThis')+'">'+ic('check')+'</button>'+
     '<div class="row-main"><div class="row-t">'+esc(m.title)+'</div>'+
-    '<div class="row-s">'+sub+'</div>'+
+    '<div class="row-s">'+sub+'</div>'+hi+
     '<div class="prog"><i style="width:'+pct+'%"></i></div></div>'+
     '<div class="row-ic '+(isGam?'vi':'cy')+'" style="width:34px;height:34px">'+ic(isGam?'users':'cal')+'</div>'+
   '</div>';
