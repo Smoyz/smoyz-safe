@@ -325,6 +325,8 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
   background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 16px;
 }
 .type-pick button:active{border-color:var(--flame)}
+.type-pick-row b{display:block;font-size:.95rem}
+.type-pick-row small{color:var(--faint);font-size:.76rem;line-height:1.5;display:block;margin-top:2px}
 .type-pick .row-ic{width:38px;height:38px}
 .type-pick b{display:block;font-size:.95rem}
 .type-pick small{color:var(--faint);font-size:.78rem}
@@ -462,8 +464,8 @@ nav#tabs .dot{position:absolute;top:7px;inset-inline-start:calc(50% - 15px);widt
 <script>
 'use strict';
 /* ================= إعدادات عامة ================= */
-const APP_VERSION='2.4'; // بيتبمب تلقائيًا من release.ps1
-const APP_VCODE=15;       // بيتبمب تلقائيًا من release.ps1
+const APP_VERSION='2.5'; // بيتبمب تلقائيًا من release.ps1
+const APP_VCODE=16;       // بيتبمب تلقائيًا من release.ps1
 const DEFAULT_UPDATE_URL='https://smoyz.github.io/smoyz-safe/version.json';
 const LS_KEY='smoyz.safe.v1';
 const LS_GUARD='smoyz.safe.guard';
@@ -618,7 +620,11 @@ ar:{
   plUrl:'لينك الموقع (اختياري)', plUrlPh:'الصق لينك من خرايط جوجل',
   plUrlHint:'افتح المكان في خرايط جوجل ← مشاركة ← نسخ الرابط، والصقه هنا',
   plNote:'ملاحظة (اختياري)', plNotePh:'الدور التالت، جنب الصيدلية...',
-  plOpen:'افتح في الخرايط', plOpenLink:'افتح اللينك',
+  plOpen:'افتح في الخرايط', plOpenLink:'افتح اللينك المحفوظ',
+  plGoT:'تروح «{x}» بإيه؟', plMapApps:'خرايط وملاحة', plRideApps:'تطبيقات النقل',
+  plCopyCoords:'انسخ الإحداثيات', plCoordsCopied:'الإحداثيات اتنسخت',
+  plRideHint:'هيفتحلك التطبيق والإحداثيات في الكليبورد — الصقها في خانة الوصول',
+  plNoApps:'مفيش تطبيقات خرايط متثبتة — انسخ الإحداثيات واستخدمها في أي تطبيق',
   plNeedName:'اكتب اسم المكان', plNeedAny:'حدد الموقع أو حط لينك',
   plSavedAt:'اتحفظ {d}', plHasLink:'لينك محفوظ', plNoApp:'مفيش تطبيق خرايط على الموبايل',
   plDelBtn:'امسح المكان ده',
@@ -764,7 +770,11 @@ en:{
   plUrl:'Map link (optional)', plUrlPh:'Paste a Google Maps link',
   plUrlHint:'Open the place in Google Maps → Share → Copy link, and paste it here',
   plNote:'Note (optional)', plNotePh:'Third floor, next to the pharmacy...',
-  plOpen:'Open in Maps', plOpenLink:'Open link',
+  plOpen:'Open in Maps', plOpenLink:'Open saved link',
+  plGoT:'How do you want to get to “{x}”?', plMapApps:'Maps & navigation', plRideApps:'Ride apps',
+  plCopyCoords:'Copy coordinates', plCoordsCopied:'Coordinates copied',
+  plRideHint:'Opens the app with the coordinates on your clipboard — paste them into the destination field',
+  plNoApps:'No maps app installed — copy the coordinates and use them in any app',
   plNeedName:'Enter the place name', plNeedAny:'Pin the location or add a link',
   plSavedAt:'saved {d}', plHasLink:'link saved', plNoApp:'No maps app on this phone',
   plDelBtn:'Delete this place',
@@ -1187,7 +1197,10 @@ window.__khaznaResume=()=>{
   if(autoLockIfIdle())return;
   if(vault&&currentTab==='set')renderTab(); /* حالة الإشعارات ممكن تكون اتغيرت من إعدادات الموبايل */
 };
-window.__khaznaToast=k=>{if(k==='noMapApp')toast(t('plNoApp'))};
+window.__khaznaToast=k=>{
+  if(k==='noMapApp')toast(t('plNoApp'));
+  else if(k==='coordsCopied')toast(t('plRideHint'));
+};
 /* زرار الرجوع في أندرويد: يقفل اللي مفتوح الأول، ومن الشاشة الرئيسية يسأل قبل الخروج.
    بيرجّع 'handled' لو اتصرف، أو 'exit' عشان أندرويد يقفل التطبيق */
 window.__khaznaBack=()=>{
@@ -1341,6 +1354,10 @@ function openMain(){
 
 /* ================= الجديد في التحديث ================= */
 const CHANGELOG={
+  '2.5':{
+    ar:['🚗 لما تدوس على سهم الملاحة جنب أي مكان، بيسألك تروح بإيه — بيعرضلك تطبيقات الخرايط والنقل المتثبتة على موبايلك (خرايط جوجل، Waze، Uber، inDrive...) وتختار اللي يناسبك'],
+    en:['🚗 Tapping the navigate arrow next to a place now asks how you want to get there — it lists the maps and ride apps actually installed on your phone (Google Maps, Waze, Uber, inDrive...) and you pick']
+  },
   '2.4':{
     ar:['💰 الجمعية بقت تحسبلك قبضك: أول ما تكتب القسط وعدد الشهور يقولك هتقبض كام (قسط 10 آلاف × 12 شهر = 120 ألف)، ولما ييجي شهر قبضك يفكّرك ويخصم قسط الشهر ويوريك الصافي اللي هيوصلك',
         '🐍 لوجو Smoyz الجديد بقى في كل حتة — أيقونة التطبيق، شاشة الفتح، وفوق في التطبيق — والألوان اتظبطت على ألوان اللوجو',
@@ -2034,6 +2051,57 @@ function openPlaceMap(p){
   const u=safeUrl(p.url);
   if(u)openExternal(u);else toast(t('plNeedAny'));
 }
+/* اختيار تطبيق الوصول: خرايط/ملاحة أو تطبيق نقل ذكي */
+function openPlaceGo(p){
+  const c=hasCoords(p)?{lat:Number(p.lat),lng:Number(p.lng)}:coordsFromUrl(p.url);
+  if(!c){const u=safeUrl(p.url);if(u)openExternal(u);else toast(t('plNeedAny'));return}
+  const la=String(c.lat), ln=String(c.lng), nm=p.name||'';
+  let apps=[];
+  if(window.Khazna&&window.Khazna.mapApps){
+    try{apps=JSON.parse(window.Khazna.mapApps()||'[]')}catch(e){apps=[]}
+  }
+  const row=(label,sub,act,icon,color)=>
+    '<button class="type-pick-row" data-go="'+act+'">'+
+      '<span class="row-ic" style="color:'+(color||'var(--cyan)')+'">'+ic(icon)+'</span>'+
+      '<span class="dr-main"><b>'+esc(label)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</span>'+
+    '</button>';
+  const maps=apps.filter(a=>a.kind==='geo'), rides=apps.filter(a=>a.kind==='ride');
+  let html='';
+  if(!window.Khazna){
+    html+='<div class="type-pick">'+
+      row('Google Maps','','web-gmaps','nav','var(--cyan)')+
+      row('Uber','','web-uber','nav','var(--ink)')+
+    '</div>';
+  }else{
+    if(maps.length){
+      html+='<div class="sec-h">'+ic('nav')+t('plMapApps')+'</div><div class="type-pick">'+
+        maps.map((a,i)=>row(a.label,'','m'+i,'nav','var(--cyan)')).join('')+'</div>';
+    }
+    if(rides.length){
+      html+='<div class="sec-h">'+ic('pin')+t('plRideApps')+'</div><div class="type-pick">'+
+        rides.map((a,i)=>row(a.label,a.mode==='copy'?t('plRideHint'):'','r'+i,'nav','var(--flame)')).join('')+'</div>';
+    }
+    if(!maps.length&&!rides.length)html+='<div class="warn-box">'+ic('alert')+'<span>'+t('plNoApps')+'</span></div>';
+  }
+  if(safeUrl(p.url))html+='<button class="btn btn-ghost" data-go="link">'+ic('link')+' '+t('plOpenLink')+'</button>';
+  html+='<button class="btn btn-ghost" data-go="copy">'+ic('copy')+' '+t('plCopyCoords')+'</button>';
+  openSheet(t('plGoT',{x:nm}),html);
+  $('#sheet-body').querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{
+    const g=b.dataset.go;
+    if(g==='copy'){
+      const txt=la+','+ln;
+      if(window.Khazna&&window.Khazna.copyCoords){try{window.Khazna.copyCoords(txt)}catch(e){}toast(t('plCoordsCopied'))}
+      else copyText(txt,{label:t('plCoordsCopied')});
+      closeSheet();return;
+    }
+    if(g==='link'){openExternal(p.url);closeSheet();return}
+    if(g==='web-gmaps'){openExternal('https://www.google.com/maps/search/?api=1&query='+la+','+ln);closeSheet();return}
+    if(g==='web-uber'){openExternal('https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]='+la+'&dropoff[longitude]='+ln+'&dropoff[nickname]='+encodeURIComponent(nm));closeSheet();return}
+    const list=g[0]==='m'?maps:rides, a=list[Number(g.slice(1))];
+    if(a){try{window.Khazna.openInApp(a.pkg,a.kind,a.mode||'',la,ln,nm)}catch(e){}}
+    closeSheet();
+  }));
+}
 function openExternal(url){
   const u=safeUrl(url);
   if(!u)return;
@@ -2468,7 +2536,7 @@ $('#content').addEventListener('click',async e=>{
   else if(act==='open-place')openPlaceForm(id);
   else if(act==='nav-place'){
     const p=vault.places.find(x=>x.id===id);
-    if(p)openPlaceMap(p);
+    if(p)openPlaceGo(p);
   }
   else if(act==='debt-remind'){openDebtRemind()}
   else if(act==='toggle-month'){
